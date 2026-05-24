@@ -1,24 +1,16 @@
-# -*- coding: utf-8 -*-
 # coletor/blaze_collector.py
 # Coleta resultados do Blaze Double via WebSocket em tempo real
 # e insere no banco de dados local.
 
-import sys
-import os
 import asyncio
 import json
 import re
-import io
+import sys, os
 from datetime import datetime
-
-# Configurar stdout para UTF-8 no Windows
-if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
-    import websockets  # type: ignore
+    import websockets
 except ImportError:
     print("[COLETOR] Instale: pip install websockets")
     sys.exit(1)
@@ -73,7 +65,8 @@ async def collect():
         try:
             async with websockets.connect(
                 BLAZE_WS_URL,
-                ping_interval=PING_INTERVAL
+                ping_interval=PING_INTERVAL,
+                extra_headers={"Origin": "https://blaze.com"}
             ) as ws:
                 print(f"[COLETOR] ✅ Conectado! Total no DB: {total_results():,} resultados")
                 retry_delay = 5
