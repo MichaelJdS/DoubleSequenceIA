@@ -22,8 +22,8 @@ MONITOR_INTERVAL  = 5       # segundos entre verificações
 HISTORY_SIZE      = 10      # quantidade de resultados recentes a manter
 
 # ── Telegram ────────────────────────────────────────────────
-TELEGRAM_TOKEN    = "SEU_BOT_TOKEN_AQUI"
-TELEGRAM_CHAT_ID  = "SEU_CHAT_ID_AQUI"
+TELEGRAM_TOKEN    = "6674179143:AAEUv9Yzu0LCqAsg05tUEcptDm8bRXBih50"
+TELEGRAM_CHAT_ID  = "5662495395"
 
 # ── Dashboard ───────────────────────────────────────────────
 STRATEGIES_JSON   = os.path.join("data", "strategies.json")
