@@ -1,0 +1,974 @@
+[
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 12,
+    "predict_color": "vermelho",
+    "predict_count": 12,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO → BRANCO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → BRANCO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "BRANCO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO → VERMELHO → BRANCO",
+    "occurrences": 9,
+    "predict_color": "vermelho",
+    "predict_count": 9,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → BRANCO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → BRANCO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → BRANCO → BRANCO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → BRANCO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → BRANCO → BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "BRANCO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "BRANCO → BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → BRANCO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO → BRANCO",
+    "occurrences": 7,
+    "predict_color": "vermelho",
+    "predict_count": 7,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO → BRANCO → VERMELHO",
+    "occurrences": 7,
+    "predict_color": "vermelho",
+    "predict_count": 7,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → BRANCO → BRANCO",
+    "occurrences": 6,
+    "predict_color": "vermelho",
+    "predict_count": 6,
+    "confidence": 100.0,
+    "distribution": {
+      "vermelho": 100.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 134,
+    "predict_color": "vermelho",
+    "predict_count": 128,
+    "confidence": 95.52,
+    "distribution": {
+      "vermelho": 95.5,
+      "branco": 4.5
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 128,
+    "predict_color": "vermelho",
+    "predict_count": 122,
+    "confidence": 95.31,
+    "distribution": {
+      "vermelho": 95.3,
+      "branco": 4.7
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 148,
+    "predict_color": "vermelho",
+    "predict_count": 141,
+    "confidence": 95.27,
+    "distribution": {
+      "vermelho": 95.3,
+      "branco": 4.7
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 122,
+    "predict_color": "vermelho",
+    "predict_count": 116,
+    "confidence": 95.08,
+    "distribution": {
+      "vermelho": 95.1,
+      "branco": 4.9
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 132,
+    "predict_color": "vermelho",
+    "predict_count": 125,
+    "confidence": 94.7,
+    "distribution": {
+      "vermelho": 94.7,
+      "branco": 5.3
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 141,
+    "predict_color": "vermelho",
+    "predict_count": 133,
+    "confidence": 94.33,
+    "distribution": {
+      "vermelho": 94.3,
+      "branco": 5.7
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 141,
+    "predict_color": "vermelho",
+    "predict_count": 132,
+    "confidence": 93.62,
+    "distribution": {
+      "vermelho": 93.6,
+      "branco": 6.4
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 151,
+    "predict_color": "vermelho",
+    "predict_count": 141,
+    "confidence": 93.38,
+    "distribution": {
+      "vermelho": 93.4,
+      "branco": 6.6
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 14,
+    "predict_color": "vermelho",
+    "predict_count": 13,
+    "confidence": 92.86,
+    "distribution": {
+      "vermelho": 92.9,
+      "branco": 7.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 14,
+    "predict_color": "vermelho",
+    "predict_count": 13,
+    "confidence": 92.86,
+    "distribution": {
+      "vermelho": 92.9,
+      "branco": 7.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 151,
+    "predict_color": "vermelho",
+    "predict_count": 140,
+    "confidence": 92.72,
+    "distribution": {
+      "vermelho": 92.7,
+      "branco": 7.3
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 1489,
+    "predict_color": "vermelho",
+    "predict_count": 1377,
+    "confidence": 92.48,
+    "distribution": {
+      "vermelho": 92.5,
+      "branco": 7.5
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 1611,
+    "predict_color": "vermelho",
+    "predict_count": 1489,
+    "confidence": 92.43,
+    "distribution": {
+      "vermelho": 92.4,
+      "branco": 7.6
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 1745,
+    "predict_color": "vermelho",
+    "predict_count": 1611,
+    "confidence": 92.32,
+    "distribution": {
+      "vermelho": 92.3,
+      "branco": 7.7
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 134,
+    "predict_color": "vermelho",
+    "predict_count": 122,
+    "confidence": 91.04,
+    "distribution": {
+      "vermelho": 91.0,
+      "branco": 9.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 133,
+    "predict_color": "vermelho",
+    "predict_count": 121,
+    "confidence": 90.98,
+    "distribution": {
+      "vermelho": 91.0,
+      "branco": 9.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 122,
+    "predict_color": "vermelho",
+    "predict_count": 111,
+    "confidence": 90.98,
+    "distribution": {
+      "vermelho": 91.0,
+      "branco": 9.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 11,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 90.91,
+    "distribution": {
+      "vermelho": 90.9,
+      "branco": 9.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 11,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 90.91,
+    "distribution": {
+      "vermelho": 90.9,
+      "branco": 9.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 4,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 148,
+    "predict_color": "vermelho",
+    "predict_count": 134,
+    "confidence": 90.54,
+    "distribution": {
+      "vermelho": 90.5,
+      "branco": 9.5
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 126,
+    "predict_color": "vermelho",
+    "predict_count": 114,
+    "confidence": 90.48,
+    "distribution": {
+      "vermelho": 90.5,
+      "branco": 9.5
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 140,
+    "predict_color": "vermelho",
+    "predict_count": 126,
+    "confidence": 90.0,
+    "distribution": {
+      "vermelho": 90.0,
+      "branco": 10.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 9,
+    "confidence": 90.0,
+    "distribution": {
+      "vermelho": 90.0,
+      "branco": 10.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 9,
+    "confidence": 90.0,
+    "distribution": {
+      "vermelho": 90.0,
+      "branco": 10.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 9,
+    "predict_color": "vermelho",
+    "predict_count": 8,
+    "confidence": 88.89,
+    "distribution": {
+      "vermelho": 88.9,
+      "branco": 11.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "branco"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → VERMELHO → BRANCO → VERMELHO → VERMELHO → BRANCO",
+    "occurrences": 8,
+    "predict_color": "vermelho",
+    "predict_count": 7,
+    "confidence": 87.5,
+    "distribution": {
+      "vermelho": 87.5,
+      "branco": 12.5
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho",
+      "branco",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → VERMELHO → VERMELHO → VERMELHO → BRANCO → VERMELHO",
+    "occurrences": 13,
+    "predict_color": "vermelho",
+    "predict_count": 10,
+    "confidence": 76.92,
+    "distribution": {
+      "vermelho": 76.9,
+      "branco": 23.1
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "BRANCO → VERMELHO → BRANCO → VERMELHO → VERMELHO → VERMELHO",
+    "occurrences": 7,
+    "predict_color": "vermelho",
+    "predict_count": 5,
+    "confidence": 71.43,
+    "distribution": {
+      "vermelho": 71.4,
+      "branco": 28.6
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "vermelho",
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 6,
+    "sequence_str": "VERMELHO → BRANCO → VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 7,
+    "confidence": 70.0,
+    "distribution": {
+      "vermelho": 70.0,
+      "branco": 30.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  },
+  {
+    "sequence": [
+      "branco",
+      "vermelho",
+      "branco",
+      "vermelho",
+      "vermelho"
+    ],
+    "sequence_size": 5,
+    "sequence_str": "BRANCO → VERMELHO → BRANCO → VERMELHO → VERMELHO",
+    "occurrences": 10,
+    "predict_color": "vermelho",
+    "predict_count": 7,
+    "confidence": 70.0,
+    "distribution": {
+      "vermelho": 70.0,
+      "branco": 30.0
+    },
+    "created_at": "2026-05-23T22:02:56.539308"
+  }
+]

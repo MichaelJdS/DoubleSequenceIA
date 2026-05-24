@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DoubleSequenceIA — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg:       #0a0a0f;
+    --bg2:      #111118;
+    --bg3:      #1a1a26;
+    --border:   #2a2a3a;
+    --accent:   #7c3aed;
+    --accent2:  #a855f7;
+    --red:      #ef4444;
+    --red-glow: #ef444444;
+    --black-c:  #94a3b8;
+    --white-c:  #e2e8f0;
+    --green:    #22c55e;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 400;
+    -webkit-text-fill-color: var(--muted);
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  #status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+  .btn-reload {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-reload:hover { background: var(--accent); border-color: var(--accent); }
+
+  /* ── Layout ── */
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+  /* ── Stats Bar ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.8rem; font-weight: 800; }
+  .stat-sub   { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── Filters ── */
+  .filters {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .filter-group select,
+  .filter-group input[type=range] {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-group select:focus { border-color: var(--accent); }
+  #conf-label { font-size: 0.85rem; color: var(--accent2); font-weight: 600; }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px 8px 36px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    position: relative;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap::before {
+    content: '🔍';
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .search-box:focus { border-color: var(--accent); }
+
+  /* ── Signals Banner ── */
+  #signals-banner {
+    background: linear-gradient(135deg, #1a0a2e, #0f1a2e);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: none;
+  }
+  #signals-banner.visible { display: block; }
+  #signals-banner h3 { font-size: 0.9rem; color: var(--accent2); margin-bottom: .75rem; }
+  .signal-list { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .signal-pill {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    display: flex; align-items: center; gap: 8px;
+    animation: fadeIn .4s ease;
+  }
+  .signal-pill.preto   { border-color: #475569; }
+  .signal-pill.vermelho{ border-color: var(--red); box-shadow: 0 0 12px var(--red-glow); }
+  .signal-pill.branco  { border-color: #94a3b8; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; } }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .5rem;
+  }
+  .tab {
+    padding: 6px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .2s;
+    color: var(--muted);
+  }
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .tab:hover:not(.active) { border-color: var(--border); color: var(--text); }
+
+  /* ── Strategy Table ── */
+  .table-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  th:hover { color: var(--text); }
+  th .sort-icon { margin-left: 4px; opacity: .4; }
+  th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  tbody tr:hover { background: var(--bg3); }
+  tbody tr:last-child { border-bottom: none; }
+  td {
+    padding: 14px 16px;
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+
+  /* Sequence chips */
+  .seq-chips { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+  .chip {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .03em;
+  }
+  .chip.preto   { background: #1e2a3a; color: #94a3b8; border: 1px solid #2d3748; }
+  .chip.vermelho{ background: #2d1515; color: #f87171; border: 1px solid #7f1d1d; }
+  .chip.branco  { background: #1e2030; color: #e2e8f0; border: 1px solid #334155; }
+  .arrow { color: var(--muted); font-size: 0.65rem; }
+
+  /* Predict badge */
+  .predict-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .predict-badge.preto   { background: #1e2a3a; color: #94a3b8; }
+  .predict-badge.vermelho{ background: #2d1515; color: #f87171; }
+  .predict-badge.branco  { background: #1e2030; color: #e2e8f0; }
+
+  /* Confidence bar */
+  .conf-wrap { min-width: 120px; }
+  .conf-bar-bg {
+    height: 6px; background: var(--bg3); border-radius: 3px;
+    overflow: hidden; margin-top: 4px;
+  }
+  .conf-bar {
+    height: 100%; border-radius: 3px;
+    transition: width .4s ease;
+  }
+  .conf-bar.high   { background: linear-gradient(90deg, var(--green), #4ade80); }
+  .conf-bar.medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .conf-bar.low    { background: linear-gradient(90deg, var(--red), #f87171); }
+  .conf-pct { font-size: 0.82rem; font-weight: 700; }
+
+  /* Distribution mini bars */
+  .dist-bars { display: flex; gap: 4px; align-items: flex-end; height: 28px; }
+  .dist-col  { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .dist-bar  { width: 18px; border-radius: 3px 3px 0 0; min-height: 2px; }
+  .dist-bar.preto   { background: #475569; }
+  .dist-bar.vermelho{ background: #ef4444; }
+  .dist-bar.branco  { background: #94a3b8; }
+  .dist-lbl  { font-size: 0.55rem; color: var(--muted); }
+
+  /* Occ badge */
+  .occ-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .empty .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty p { font-size: 0.9rem; }
+
+  /* Signals tab */
+  .signals-full { padding: 1rem; }
+  .signal-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    transition: border-color .2s;
+  }
+  .signal-card.preto   { border-left: 4px solid #475569; }
+  .signal-card.vermelho{ border-left: 4px solid var(--red); }
+  .signal-card.branco  { border-left: 4px solid #94a3b8; }
+  .signal-card:hover { border-color: var(--accent); }
+  .signal-seq { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); }
+  .signal-meta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .signal-time { font-size: 0.75rem; color: var(--muted); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container { padding: 1rem; }
+    header { padding: 0 1rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    td, th { padding: 10px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    <div>
+      <h1>DoubleSequenceIA</h1>
+      <span>Pattern Recognition Engine</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="status-badge"><div class="dot"></div><span id="status-text">Carregando...</span></div>
+    <button class="btn-reload" onclick="loadData()">↻ Atualizar</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Estratégias</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">geradas pela análise</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Confiança Média</div>
+      <div class="stat-value" id="stat-avg-conf" style="color:var(--accent2)">—</div>
+      <div class="stat-sub">% média do catálogo</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Alta Confiança</div>
+      <div class="stat-value" id="stat-high" style="color:var(--green)">—</div>
+      <div class="stat-sub">≥ 90%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Sinais Hoje</div>
+      <div class="stat-value" id="stat-signals" style="color:var(--red)">—</div>
+      <div class="stat-sub">do log de sinais</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Seq. 4 Cores</div>
+      <div class="stat-value" id="stat-s4">—</div>
+      <div class="stat-sub">estratégias</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Seq. 5 Cores</div>
+      <div class="stat-value" id="stat-s5">—</div>
+      <div class="stat-sub">estratégias</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Seq. 6 Cores</div>
+      <div class="stat-value" id="stat-s6">—</div>
+      <div class="stat-sub">estratégias</div>
+    </div>
+  </div>
+
+  <!-- Active signals banner -->
+  <div id="signals-banner">
+    <h3>🚨 Últimos Sinais Detectados</h3>
+    <div class="signal-list" id="signal-pills"></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="search-wrap">
+      <input class="search-box" id="search" type="text" placeholder="Buscar sequência... ex: PRETO → VERMELHO">
+    </div>
+    <div class="filter-group">
+      <label>Tamanho</label>
+      <select id="filter-size">
+        <option value="all">Todos</option>
+        <option value="4">4 cores</option>
+        <option value="5">5 cores</option>
+        <option value="6">6 cores</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Apostar em</label>
+      <select id="filter-color">
+        <option value="all">Todas</option>
+        <option value="preto">⚫ Preto</option>
+        <option value="vermelho">🔴 Vermelho</option>
+        <option value="branco">⚪ Branco</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Confiança mín: <span id="conf-label">70%</span></label>
+      <input type="range" id="filter-conf" min="70" max="100" value="70" step="1">
+    </div>
+    <div class="filter-group">
+      <label>Ordenar por</label>
+      <select id="sort-by">
+        <option value="confidence">Confiança</option>
+        <option value="occurrences">Ocorrências</option>
+        <option value="sequence_size">Tamanho</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('strategies', this)">📊 Estratégias</div>
+    <div class="tab" onclick="switchTab('signals', this)">🚨 Sinais</div>
+  </div>
+
+  <!-- Tab: Strategies -->
+  <div id="tab-strategies">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Sequência</th>
+            <th>Apostar em</th>
+            <th class="sorted" onclick="sortBy('confidence')">Confiança <span class="sort-icon">▼</span></th>
+            <th>Distribuição</th>
+            <th onclick="sortBy('occurrences')">Ocorrências <span class="sort-icon">↕</span></th>
+            <th>Tamanho</th>
+          </tr>
+        </thead>
+        <tbody id="strategies-tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty-state" class="empty" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <p>Nenhuma estratégia encontrada com os filtros atuais.</p>
+    </div>
+  </div>
+
+  <!-- Tab: Signals -->
+  <div id="tab-signals" style="display:none">
+    <div class="table-wrap">
+      <div class="signals-full" id="signals-list"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+let allStrategies = [];
+let allSignals    = [];
+let currentSort  = 'confidence';
+let currentTab   = 'strategies';
+
+/* ── Load Data ─────────────────────────── */
+async function loadData() {
+  document.getElementById('status-text').textContent = 'Carregando...';
+  try {
+    const [stratRes, sigRes] = await Promise.allSettled([
+      fetch('../data/strategies.json').then(r => r.json()),
+      fetch('../data/signals_log.json').then(r => r.json()),
+    ]);
+
+    allStrategies = stratRes.status === 'fulfilled' ? stratRes.value : [];
+    allSignals    = sigRes.status   === 'fulfilled' ? sigRes.value   : [];
+
+    updateStats();
+    renderStrategies();
+    renderSignals();
+    renderSignalBanner();
+    document.getElementById('status-text').textContent =
+      `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}`;
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'Erro ao carregar dados';
+    console.error(e);
+  }
+}
+
+/* ── Stats ──────────────────────────────── */
+function updateStats() {
+  const s = allStrategies;
+  document.getElementById('stat-total').textContent = s.length;
+  if (s.length) {
+    const avg = (s.reduce((a,b) => a + b.confidence, 0) / s.length).toFixed(1);
+    document.getElementById('stat-avg-conf').textContent = avg + '%';
+  }
+  document.getElementById('stat-high').textContent = s.filter(x => x.confidence >= 90).length;
+
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('stat-signals').textContent =
+    allSignals.filter(x => x.logged_at && x.logged_at.startsWith(today)).length;
+
+  [4,5,6].forEach(n => {
+    document.getElementById(`stat-s${n}`).textContent = s.filter(x => x.sequence_size === n).length;
+  });
+}
+
+/* ── Signals Banner ─────────────────────── */
+function renderSignalBanner() {
+  const banner = document.getElementById('signals-banner');
+  const pills  = document.getElementById('signal-pills');
+  const recent = allSignals.slice(0, 8);
+  if (!recent.length) { banner.classList.remove('visible'); return; }
+  banner.classList.add('visible');
+  pills.innerHTML = recent.map(s => {
+    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
+    const t = s.logged_at ? new Date(s.logged_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+    return `<div class="signal-pill ${s.predict_color}">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.8rem">${s.sequence_str}</span>
+      <span>${e} ${s.predict_color.toUpperCase()}</span>
+      <span style="color:var(--accent2);font-weight:700">${s.confidence}%</span>
+      ${t ? `<span style="color:var(--muted);font-size:.72rem">${t}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ── Filter & Render Strategies ─────────── */
+function getFiltered() {
+  const search    = document.getElementById('search').value.toLowerCase();
+  const size      = document.getElementById('filter-size').value;
+  const color     = document.getElementById('filter-color').value;
+  const minConf   = parseFloat(document.getElementById('filter-conf').value);
+  const sortField = document.getElementById('sort-by').value;
+
+  let data = allStrategies.filter(s => {
+    if (s.confidence < minConf) return false;
+    if (size  !== 'all' && s.sequence_size !== parseInt(size)) return false;
+    if (color !== 'all' && s.predict_color !== color) return false;
+    if (search && !s.sequence_str.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  data.sort((a,b) => b[sortField] - a[sortField]);
+  return data;
+}
+
+function renderStrategies() {
+  const data  = getFiltered();
+  const tbody = document.getElementById('strategies-tbody');
+  const empty = document.getElementById('empty-state');
+  const table = document.querySelector('.table-wrap');
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display  = 'block';
+    table.style.display  = 'none';
+    return;
+  }
+  empty.style.display  = 'none';
+  table.style.display  = '';
+
+  tbody.innerHTML = data.map((s, i) => {
+    const chips = s.sequence.map(c =>
+      `<span class="chip ${c}">${c.substring(0,3).toUpperCase()}</span>`
+    ).join('<span class="arrow">›</span>');
+
+    const confClass = s.confidence >= 90 ? 'high' : s.confidence >= 80 ? 'medium' : 'low';
+    const confColor = s.confidence >= 90 ? 'var(--green)' : s.confidence >= 80 ? '#f59e0b' : 'var(--red)';
+
+    const maxDist = Math.max(...Object.values(s.distribution));
+    const distBars = Object.entries(s.distribution).map(([c, p]) => {
+      const h = Math.max(4, Math.round(p / maxDist * 28));
+      return `<div class="dist-col">
+        <div class="dist-bar ${c}" style="height:${h}px" title="${c}: ${p}%"></div>
+        <div class="dist-lbl">${c.substring(0,3).toUpperCase()}</div>
+      </div>`;
+    }).join('');
+
+    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
+
+    return `<tr>
+      <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
+      <td><div class="seq-chips">${chips}</div></td>
+      <td><span class="predict-badge ${s.predict_color}">${e} ${s.predict_color.toUpperCase()}</span></td>
+      <td>
+        <div class="conf-wrap">
+          <span class="conf-pct" style="color:${confColor}">${s.confidence}%</span>
+          <div class="conf-bar-bg"><div class="conf-bar ${confClass}" style="width:${s.confidence}%"></div></div>
+        </div>
+      </td>
+      <td><div class="dist-bars">${distBars}</div></td>
+      <td><span class="occ-badge">${s.occurrences}×</span></td>
+      <td style="color:var(--muted);font-size:.8rem">${s.sequence_size} cores</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Render Signals Tab ─────────────────── */
+function renderSignals() {
+  const list = document.getElementById('signals-list');
+  if (!allSignals.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Nenhum sinal registrado ainda.</p></div>';
+    return;
+  }
+  list.innerHTML = allSignals.slice(0, 100).map(s => {
+    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
+    const t = s.logged_at ? new Date(s.logged_at).toLocaleString('pt-BR') : '—';
+    const dist = Object.entries(s.distribution || {})
+      .map(([c,p]) => `<span style="opacity:.7">${c.substring(0,3).toUpperCase()}: <b>${p}%</b></span>`)
+      .join(' &nbsp;|&nbsp; ');
+    return `<div class="signal-card ${s.predict_color}">
+      <div>
+        <div class="signal-seq">${s.sequence_str}</div>
+        <div class="signal-meta" style="margin-top:6px">${dist}</div>
+      </div>
+      <div class="signal-meta">
+        <span class="predict-badge ${s.predict_color}">${e} ${s.predict_color.toUpperCase()}</span>
+        <span class="conf-pct" style="color:var(--accent2)">${s.confidence}%</span>
+        <span class="occ-badge">${s.occurrences}×</span>
+        <span class="signal-time">${t}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Tabs ────────────────────────────────── */
+function switchTab(name, el) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-strategies').style.display = name === 'strategies' ? '' : 'none';
+  document.getElementById('tab-signals').style.display    = name === 'signals'    ? '' : 'none';
+}
+
+/* ── Sort ────────────────────────────────── */
+function sortBy(field) {
+  currentSort = field;
+  document.getElementById('sort-by').value = field;
+  renderStrategies();
+}
+
+/* ── Events ──────────────────────────────── */
+document.getElementById('search').addEventListener('input', renderStrategies);
+document.getElementById('filter-size').addEventListener('change', renderStrategies);
+document.getElementById('filter-color').addEventListener('change', renderStrategies);
+document.getElementById('sort-by').addEventListener('change', renderStrategies);
+document.getElementById('filter-conf').addEventListener('input', function() {
+  document.getElementById('conf-label').textContent = this.value + '%';
+  renderStrategies();
+});
+
+/* ── Auto-refresh every 30s ─────────────── */
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>
