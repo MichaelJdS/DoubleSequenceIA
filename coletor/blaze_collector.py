@@ -10,7 +10,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
-    import websockets
+    import websockets  # type: ignore
 except ImportError:
     print("[COLETOR] Instale: pip install websockets")
     sys.exit(1)
@@ -65,8 +65,7 @@ async def collect():
         try:
             async with websockets.connect(
                 BLAZE_WS_URL,
-                ping_interval=PING_INTERVAL,
-                extra_headers={"Origin": "https://blaze.com"}
+                ping_interval=PING_INTERVAL
             ) as ws:
                 print(f"[COLETOR] ✅ Conectado! Total no DB: {total_results():,} resultados")
                 retry_delay = 5
