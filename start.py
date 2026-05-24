@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 # start.py — Inicia todo o sistema DoubleSequenceIA de uma vez
 # Abre: Coletor + Analisador + Monitor + Dashboard no navegador
 
@@ -11,14 +12,21 @@ import json
 import http.server
 import socketserver
 import webbrowser
+import io
 from datetime import datetime
+
+# Forcar UTF-8 no stdout/stderr do Windows
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT, "data")
 DB_PATH  = os.path.join(DATA_DIR, "blaze_double.db")
 STRATS   = os.path.join(DATA_DIR, "strategies.json")
-DASH_DIR = os.path.join(ROOT, "dashboard")
-DASH_PORT = 8765
+DASH_DIR  = os.path.join(ROOT, "dashboard")
+DASH_PORT = 8766   # servidor de arquivos estaticos
+API_PORT  = 8765   # API JSON
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -33,14 +41,14 @@ RESET  = "\033[0m"
 def banner():
     print(f"""
 {PURPLE}{BOLD}
- ██████╗  ██████╗ ██╗   ██╗██████╗ ██╗     ███████╗
- ██╔══██╗██╔═══██╗██║   ██║██╔══██╗██║     ██╔════╝
- ██║  ██║██║   ██║██║   ██║██████╔╝██║     █████╗  
- ██║  ██║██║   ██║██║   ██║██╔══██╗██║     ██╔══╝  
- ██████╔╝╚██████╔╝╚██████╔╝██████╔╝███████╗███████╗
- ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚══════╝
-{RESET}{CYAN}         SequenceIA — Pattern Recognition Engine{RESET}
-{PURPLE}{'═'*54}{RESET}
+  ____  ____  _   _ ____  _     _____
+ | __ )|  _ \| | | |  _ \| |   | ____|
+ |  _ \| | | | | | | |_) | |   |  _|
+ | |_) | |_| | |_| |  _ <| |___| |___
+ |____/|____/ \___/|_|_\_|_____|_____|
+  SequenceIA  — Double Pattern Engine
+{RESET}{CYAN}  Pattern Recognition Engine v2.0{RESET}
+{PURPLE}{'='*54}{RESET}
 """)
 
 def log(tag, msg, color=CYAN):
@@ -50,7 +58,7 @@ def log(tag, msg, color=CYAN):
 def step(n, total, msg):
     bar_len = 20
     filled  = round(n / total * bar_len)
-    bar     = "█" * filled + "░" * (bar_len - filled)
+    bar     = "#" * filled + "-" * (bar_len - filled)
     print(f"\r  {PURPLE}[{bar}]{RESET} {CYAN}{msg:<40}{RESET}", end="", flush=True)
     if n == total:
         print()
@@ -118,11 +126,11 @@ def start_dashboard_server():
     except OSError as e:
         log("DASH", f"Porta {DASH_PORT} em uso ou erro: {e}", YELLOW)
 
-# ── Servidor de API ───────────────────────────────────────
+# -- Servidor de API -----------------------------------------------
 def _start_api_server():
     try:
         from api_server import start_server
-        start_server(port=8765)
+        start_server(port=API_PORT)
     except Exception as e:
         log("API", f"Erro ao iniciar API: {e}", RED)
 
@@ -147,23 +155,23 @@ def start_process(name, args, color=CYAN):
     threading.Thread(target=stream, args=(p, name, color), daemon=True).start()
     return p
 
-# ── Abre Dashboard ────────────────────────────────────────
+# -- Abre Dashboard -----------------------------------------------
 def open_dashboard():
     url = f"http://localhost:{DASH_PORT}/index.html"
-    log("DASH", f"Abrindo dashboard → {url}", GREEN)
+    log("DASH", f"Abrindo dashboard -> {url}", GREEN)
     time.sleep(1.5)
     webbrowser.open(url)
 
-# ── Shutdown ──────────────────────────────────────────────
+# -- Shutdown -----------------------------------------------
 def shutdown():
-    print(f"\n{YELLOW}  Encerrando todos os processos...{RESET}")
+    print(f"\n  Encerrando todos os processos...")
     for name, p in processes:
         try:
             p.terminate()
             log(name, "Encerrado", YELLOW)
         except Exception:
             pass
-    print(f"{GREEN}  Sistema encerrado.{RESET}\n")
+    print(f"  Sistema encerrado.\n")
 
 # ═════════════════════════════════════════════════════════
 def main():
@@ -185,7 +193,7 @@ def main():
     step(2, 5, "Análise concluída")
     print()
 
-    # 3. Servidor do dashboard
+    # 3. Servidor do dashboard (arquivos estaticos)
     step(2, 5, "Iniciando servidor do dashboard...")
     dash_thread = threading.Thread(target=start_dashboard_server, daemon=True)
     dash_thread.start()
@@ -194,12 +202,12 @@ def main():
     step(3, 5, "Dashboard pronto")
     print()
 
-    # 4. API Server
+    # 4. API Server (JSON endpoints)
     step(3, 5, "Iniciando servidor de API...")
     api_thread = threading.Thread(target=_start_api_server, daemon=True)
     api_thread.start()
     time.sleep(0.5)
-    log("API", f"API rodando em http://localhost:8765", GREEN)
+    log("API", f"API rodando em http://localhost:{API_PORT}", GREEN)
     step(4, 5, "API pronta")
     print()
 
@@ -215,23 +223,24 @@ def main():
     start_process("MONITOR", [sys.executable, "main.py", "monitor"], GREEN)
     print()
 
-    # 6. Abre o dashboard no navegador
+    # Abrir dashboard
     open_dashboard()
 
-    print(f"\n  {PURPLE}{'═'*54}{RESET}")
-    print(f"  {GREEN}{BOLD}✅ SISTEMA ONLINE!{RESET}")
-    print(f"  {PURPLE}{'═'*54}{RESET}")
-    print(f"  {CYAN}Dashboard  → {RESET}http://localhost:{DASH_PORT}/dashboard/index.html")
-    print(f"  {CYAN}Coletor    → {RESET}WebSocket Blaze ativo")
-    print(f"  {CYAN}Monitor    → {RESET}Detectando padrões em tempo real")
+    print(f"\n  {'='*54}")
+    print(f"  [OK] SISTEMA ONLINE!")
+    print(f"  {'='*54}")
+    print(f"  Dashboard  -> http://localhost:{DASH_PORT}/index.html")
+    print(f"  API JSON   -> http://localhost:{API_PORT}")
+    print(f"  Coletor    -> WebSocket Blaze ativo")
+    print(f"  Monitor    -> Detectando padroes em tempo real")
     if has_strats and os.path.exists(STRATS):
         with open(STRATS) as f:
             n = len(json.load(f))
-        print(f"  {CYAN}Estratégias→ {RESET}{n} carregadas")
-    print(f"\n  {YELLOW}Pressione Ctrl+C para encerrar tudo.{RESET}\n")
-    print(f"  {PURPLE}{'─'*54}{RESET}")
-    print(f"  {CYAN}LOGS EM TEMPO REAL:{RESET}")
-    print(f"  {PURPLE}{'─'*54}{RESET}\n")
+        print(f"  Estrategias-> {n} carregadas")
+    print(f"\n  Pressione Ctrl+C para encerrar tudo.\n")
+    print(f"  {'-'*54}")
+    print(f"  LOGS EM TEMPO REAL:")
+    print(f"  {'-'*54}\n")
 
     # Fica vivo monitorando
     try:

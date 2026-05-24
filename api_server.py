@@ -10,10 +10,6 @@ from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
-# Configurar stdout para UTF-8 no Windows
-if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
 sys.path.insert(0, os.path.dirname(__file__))
 
 from config import SIGNALS_LOG_JSON, DB_PATH
@@ -235,13 +231,23 @@ def reset_stats():
 
 def start_server(port=8765):
     server = HTTPServer(("localhost", port), DashboardAPI)
-    print(f"[API] Servidor rodando em http://localhost:{port}")
+    try:
+        print(f"[API] Servidor rodando em http://localhost:{port}", flush=True)
+    except Exception:
+        pass
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("[API] Servidor encerrado")
+        try:
+            print("[API] Servidor encerrado")
+        except Exception:
+            pass
         server.shutdown()
 
 
 if __name__ == "__main__":
+    import io as _io
+    if sys.platform == "win32":
+        sys.stdout = _io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        sys.stderr = _io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
     start_server()
