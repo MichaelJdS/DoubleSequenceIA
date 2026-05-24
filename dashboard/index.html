@@ -4,724 +4,1036 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>DoubleSequenceIA — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-  :root {
-    --bg:       #0a0a0f;
-    --bg2:      #111118;
-    --bg3:      #1a1a26;
-    --border:   #2a2a3a;
-    --accent:   #7c3aed;
-    --accent2:  #a855f7;
-    --red:      #ef4444;
-    --red-glow: #ef444444;
-    --black-c:  #94a3b8;
-    --white-c:  #e2e8f0;
-    --green:    #22c55e;
-    --text:     #e2e8f0;
-    --muted:    #64748b;
-    --card-shadow: 0 4px 24px rgba(0,0,0,0.5);
-  }
+:root {
+  --bg:        #07070f;
+  --bg2:       #0e0e1a;
+  --bg3:       #161625;
+  --bg4:       #1e1e30;
+  --border:    #252538;
+  --accent:    #7c3aed;
+  --accent2:   #a855f7;
+  --accent3:   #c084fc;
+  --red:       #ef4444;
+  --red-soft:  #3d1515;
+  --green:     #22c55e;
+  --green-soft:#0d2e1a;
+  --yellow:    #f59e0b;
+  --yellow-soft:#2e2100;
+  --blue:      #3b82f6;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --muted2:    #94a3b8;
+  --card-glow: 0 0 40px rgba(124,58,237,0.08);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-  }
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 
-  /* ── Header ── */
-  header {
-    background: linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(12px);
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .logo h1 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #fff, var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .logo span {
-    font-size: 0.7rem;
-    color: var(--muted);
-    font-weight: 400;
-    -webkit-text-fill-color: var(--muted);
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  #status-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
-  }
-  .btn-reload {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .btn-reload:hover { background: var(--accent); border-color: var(--accent); }
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:220px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:200;
+  transition:transform .3s;
+}
+.sidebar-logo{
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--border);
+}
+.logo-icon{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:10px;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4);
+}
+.logo-title{
+  font-size:.95rem;font-weight:800;
+  background:linear-gradient(90deg,#fff,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.logo-sub{font-size:.65rem;color:var(--muted);margin-top:2px}
 
-  /* ── Layout ── */
-  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+.nav{padding:16px 10px;flex:1}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.82rem;font-weight:500;
+  color:var(--muted2);cursor:pointer;
+  transition:all .2s;margin-bottom:3px;
+  border:1px solid transparent;
+}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(168,85,247,.1));
+  color:#fff;border-color:rgba(124,58,237,.4);
+}
+.nav-item .nav-icon{font-size:1rem;width:20px;text-align:center}
+.nav-badge{
+  margin-left:auto;background:var(--accent);
+  color:#fff;font-size:.6rem;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+}
 
-  /* ── Stats Bar ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  .stat-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform .2s, border-color .2s;
-  }
-  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
-  .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
-  .stat-value { font-size: 1.8rem; font-weight: 800; }
-  .stat-sub   { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.sidebar-bottom{
+  padding:16px;border-top:1px solid var(--border);
+}
+.status-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* ── Filters ── */
-  .filters {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
-  }
-  .filter-group { display: flex; flex-direction: column; gap: 4px; }
-  .filter-group label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-  .filter-group select,
-  .filter-group input[type=range] {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    outline: none;
-    cursor: pointer;
-  }
-  .filter-group select:focus { border-color: var(--accent); }
-  #conf-label { font-size: 0.85rem; color: var(--accent2); font-weight: 600; }
-  .search-box {
-    flex: 1;
-    min-width: 200px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 8px 14px 8px 36px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    outline: none;
-    position: relative;
-  }
-  .search-wrap { position: relative; flex: 1; min-width: 200px; }
-  .search-wrap::before {
-    content: '🔍';
-    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-    font-size: 14px;
-    pointer-events: none;
-  }
-  .search-box:focus { border-color: var(--accent); }
+/* ── MAIN ── */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
 
-  /* ── Signals Banner ── */
-  #signals-banner {
-    background: linear-gradient(135deg, #1a0a2e, #0f1a2e);
-    border: 1px solid var(--accent);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-    display: none;
-  }
-  #signals-banner.visible { display: block; }
-  #signals-banner h3 { font-size: 0.9rem; color: var(--accent2); margin-bottom: .75rem; }
-  .signal-list { display: flex; flex-wrap: wrap; gap: .75rem; }
-  .signal-pill {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: 0.82rem;
-    display: flex; align-items: center; gap: 8px;
-    animation: fadeIn .4s ease;
-  }
-  .signal-pill.preto   { border-color: #475569; }
-  .signal-pill.vermelho{ border-color: var(--red); box-shadow: 0 0 12px var(--red-glow); }
-  .signal-pill.branco  { border-color: #94a3b8; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; } }
+/* ── TOPBAR ── */
+.topbar{
+  height:60px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.page-title{font-size:1rem;font-weight:700}
+.page-sub{font-size:.75rem;color:var(--muted)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.btn{
+  padding:7px 16px;border-radius:9px;font-size:.8rem;
+  font-weight:600;cursor:pointer;transition:all .2s;
+  border:1px solid var(--border);
+}
+.btn-ghost{background:var(--bg3);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 14px rgba(124,58,237,.35);
+}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(124,58,237,.6);transform:translateY(-1px)}
+#last-update{font-size:.72rem;color:var(--muted)}
 
-  /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    gap: .5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: .5rem;
-  }
-  .tab {
-    padding: 6px 18px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all .2s;
-    color: var(--muted);
-  }
-  .tab.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-  .tab:hover:not(.active) { border-color: var(--border); color: var(--text); }
+/* ── PAGE ── */
+.page{display:none;padding:24px;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  /* ── Strategy Table ── */
-  .table-wrap {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-  }
-  table { width: 100%; border-collapse: collapse; }
-  thead tr {
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-  }
-  th {
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--muted);
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-  }
-  th:hover { color: var(--text); }
-  th .sort-icon { margin-left: 4px; opacity: .4; }
-  th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .15s;
-  }
-  tbody tr:hover { background: var(--bg3); }
-  tbody tr:last-child { border-bottom: none; }
-  td {
-    padding: 14px 16px;
-    font-size: 0.875rem;
-    vertical-align: middle;
-  }
+/* ── SECTION HEADER ── */
+.section-header{margin-bottom:18px}
+.section-title{font-size:1.05rem;font-weight:700;margin-bottom:3px}
+.section-sub{font-size:.78rem;color:var(--muted)}
 
-  /* Sequence chips */
-  .seq-chips { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
-  .chip {
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: .03em;
-  }
-  .chip.preto   { background: #1e2a3a; color: #94a3b8; border: 1px solid #2d3748; }
-  .chip.vermelho{ background: #2d1515; color: #f87171; border: 1px solid #7f1d1d; }
-  .chip.branco  { background: #1e2030; color: #e2e8f0; border: 1px solid #334155; }
-  .arrow { color: var(--muted); font-size: 0.65rem; }
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:18px 20px;
+  position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+  cursor:default;
+}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--card-glow);border-color:var(--accent)}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),#4ade80)}
+.stat-card.red::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),#fbbf24)}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),#60a5fa)}
+.stat-icon{font-size:1.4rem;margin-bottom:8px}
+.stat-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.stat-value{font-size:2rem;font-weight:900;line-height:1}
+.stat-sub{font-size:.7rem;color:var(--muted);margin-top:4px}
+.stat-trend{
+  position:absolute;top:16px;right:16px;
+  font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:6px;
+}
+.stat-trend.up{background:var(--green-soft);color:var(--green)}
+.stat-trend.down{background:var(--red-soft);color:var(--red)}
 
-  /* Predict badge */
-  .predict-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-  .predict-badge.preto   { background: #1e2a3a; color: #94a3b8; }
-  .predict-badge.vermelho{ background: #2d1515; color: #f87171; }
-  .predict-badge.branco  { background: #1e2030; color: #e2e8f0; }
+/* ── CHARTS ROW ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px}
+.charts-row-2{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:24px}
+.chart-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:20px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.chart-card:hover{border-color:rgba(124,58,237,.4);box-shadow:var(--card-glow)}
+.chart-title{font-size:.85rem;font-weight:700;margin-bottom:4px}
+.chart-sub{font-size:.7rem;color:var(--muted);margin-bottom:16px}
+.chart-wrap{position:relative;width:100%}
 
-  /* Confidence bar */
-  .conf-wrap { min-width: 120px; }
-  .conf-bar-bg {
-    height: 6px; background: var(--bg3); border-radius: 3px;
-    overflow: hidden; margin-top: 4px;
-  }
-  .conf-bar {
-    height: 100%; border-radius: 3px;
-    transition: width .4s ease;
-  }
-  .conf-bar.high   { background: linear-gradient(90deg, var(--green), #4ade80); }
-  .conf-bar.medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-  .conf-bar.low    { background: linear-gradient(90deg, var(--red), #f87171); }
-  .conf-pct { font-size: 0.82rem; font-weight: 700; }
+/* ── SIGNAL ALERT ── */
+#signal-alert{
+  display:none;
+  background:linear-gradient(135deg,#1a0a2e,#0a1a2e);
+  border:1px solid var(--accent);border-radius:16px;
+  padding:16px 20px;margin-bottom:20px;
+  animation:slideDown .4s ease;
+}
+#signal-alert.visible{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.alert-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.alert-badge{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-size:.7rem;font-weight:700;
+  padding:3px 10px;border-radius:6px;
+  animation:pulse 1.5s infinite;
+}
+.alert-title{font-size:.9rem;font-weight:700;color:var(--accent2)}
+.signal-pills{display:flex;flex-wrap:wrap;gap:8px}
+.signal-pill{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:8px 14px;
+  font-size:.8rem;display:flex;align-items:center;gap:8px;
+}
+.signal-pill.vermelho{border-color:var(--red);box-shadow:0 0 12px rgba(239,68,68,.2)}
+.signal-pill.preto{border-color:#475569}
+.signal-pill.branco{border-color:#94a3b8}
 
-  /* Distribution mini bars */
-  .dist-bars { display: flex; gap: 4px; align-items: flex-end; height: 28px; }
-  .dist-col  { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .dist-bar  { width: 18px; border-radius: 3px 3px 0 0; min-height: 2px; }
-  .dist-bar.preto   { background: #475569; }
-  .dist-bar.vermelho{ background: #ef4444; }
-  .dist-bar.branco  { background: #94a3b8; }
-  .dist-lbl  { font-size: 0.55rem; color: var(--muted); }
+/* ── TABLE ── */
+.table-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;margin-bottom:20px;
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:10px;
+}
+.table-title{font-size:.9rem;font-weight:700}
+.table-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none}
+.search-input{
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:7px 12px 7px 32px;
+  border-radius:9px;font-size:.8rem;outline:none;width:200px;
+  transition:border-color .2s;
+}
+.search-input:focus{border-color:var(--accent)}
+select.filter-sel{
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:7px 10px;border-radius:9px;
+  font-size:.78rem;outline:none;cursor:pointer;
+}
+select.filter-sel:focus{border-color:var(--accent)}
+.conf-range-wrap{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)}
+.conf-range-wrap input{width:90px;accent-color:var(--accent)}
+#conf-val{color:var(--accent2);font-weight:700}
 
-  /* Occ badge */
-  .occ-badge {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-  }
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg3);border-bottom:1px solid var(--border)}
+th{
+  padding:11px 14px;text-align:left;
+  font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:600;cursor:pointer;white-space:nowrap;
+  user-select:none;
+}
+th:hover{color:var(--text)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:var(--bg3)}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 14px;font-size:.82rem;vertical-align:middle}
 
-  /* Empty state */
-  .empty {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--muted);
-  }
-  .empty .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-  .empty p { font-size: 0.9rem; }
+/* chips */
+.seq-chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.chip{
+  padding:3px 9px;border-radius:6px;
+  font-size:.68rem;font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+}
+.chip.preto{background:#1a2030;color:#94a3b8;border:1px solid #2d3748}
+.chip.vermelho{background:#2d1515;color:#f87171;border:1px solid #7f1d1d}
+.chip.branco{background:#1e2030;color:#e2e8f0;border:1px solid #334155}
+.arrow{color:var(--muted);font-size:.6rem;margin:0 1px}
 
-  /* Signals tab */
-  .signals-full { padding: 1rem; }
-  .signal-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    transition: border-color .2s;
-  }
-  .signal-card.preto   { border-left: 4px solid #475569; }
-  .signal-card.vermelho{ border-left: 4px solid var(--red); }
-  .signal-card.branco  { border-left: 4px solid #94a3b8; }
-  .signal-card:hover { border-color: var(--accent); }
-  .signal-seq { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); }
-  .signal-meta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-  .signal-time { font-size: 0.75rem; color: var(--muted); }
+/* predict */
+.predict-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:8px;
+  font-size:.75rem;font-weight:700;
+}
+.predict-badge.preto{background:#1a2030;color:#94a3b8}
+.predict-badge.vermelho{background:#2d1515;color:#f87171}
+.predict-badge.branco{background:#1e2030;color:#e2e8f0}
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+/* confidence */
+.conf-cell{min-width:110px}
+.conf-num{font-size:.82rem;font-weight:700}
+.conf-bar-bg{height:5px;background:var(--bg4);border-radius:3px;margin-top:4px;overflow:hidden}
+.conf-bar{height:100%;border-radius:3px;transition:width .5s ease}
+.conf-bar.high{background:linear-gradient(90deg,var(--green),#4ade80)}
+.conf-bar.med{background:linear-gradient(90deg,var(--yellow),#fbbf24)}
+.conf-bar.low{background:linear-gradient(90deg,var(--red),#f87171)}
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .container { padding: 1rem; }
-    header { padding: 0 1rem; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    td, th { padding: 10px 10px; }
-  }
+/* mini dist */
+.dist-mini{display:flex;gap:3px;align-items:flex-end;height:26px}
+.dm-col{display:flex;flex-direction:column;align-items:center;gap:1px}
+.dm-bar{width:16px;border-radius:2px 2px 0 0;min-height:2px}
+.dm-bar.preto{background:#475569}
+.dm-bar.vermelho{background:#ef4444}
+.dm-bar.branco{background:#94a3b8}
+.dm-lbl{font-size:.5rem;color:var(--muted)}
+
+/* occ */
+.occ{
+  background:var(--bg3);border:1px solid var(--border);
+  padding:3px 9px;border-radius:6px;
+  font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted2);
+}
+
+/* empty */
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-icon{font-size:2.5rem;margin-bottom:12px}
+
+/* ── SIGNALS PAGE ── */
+.signal-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;padding:16px 20px;
+  margin-bottom:10px;display:flex;
+  align-items:center;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;
+  transition:border-color .2s,box-shadow .2s;
+}
+.signal-card:hover{border-color:var(--accent);box-shadow:var(--card-glow)}
+.signal-card.vermelho{border-left:4px solid var(--red)}
+.signal-card.preto{border-left:4px solid #475569}
+.signal-card.branco{border-left:4px solid #94a3b8}
+.sc-seq{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600}
+.sc-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sc-time{font-size:.7rem;color:var(--muted)}
+
+/* ── HEATMAP ── */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.hm-cell{
+  aspect-ratio:1;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace;
+  cursor:pointer;transition:transform .15s;
+  border:1px solid transparent;
+}
+.hm-cell:hover{transform:scale(1.15);border-color:var(--accent)}
+.hm-header{display:flex;gap:4px;margin-bottom:4px}
+.hm-label{font-size:.6rem;color:var(--muted);text-align:center;flex:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .main{margin-left:0}
+  .charts-row{grid-template-columns:1fr}
+  .charts-row-2{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
     <div class="logo-icon">🎯</div>
-    <div>
-      <h1>DoubleSequenceIA</h1>
-      <span>Pattern Recognition Engine</span>
+    <div class="logo-title">DoubleSequenceIA</div>
+    <div class="logo-sub">Pattern Recognition Engine</div>
+  </div>
+  <div class="nav">
+    <div class="nav-item active" onclick="navigate('overview',this)">
+      <span class="nav-icon">📊</span> Visão Geral
+    </div>
+    <div class="nav-item" onclick="navigate('strategies',this)">
+      <span class="nav-icon">🧠</span> Estratégias
+      <span class="nav-badge" id="nb-strats">0</span>
+    </div>
+    <div class="nav-item" onclick="navigate('signals',this)">
+      <span class="nav-icon">🚨</span> Sinais
+      <span class="nav-badge" id="nb-signals">0</span>
+    </div>
+    <div class="nav-item" onclick="navigate('heatmap',this)">
+      <span class="nav-icon">🔥</span> Heatmap
     </div>
   </div>
-  <div class="header-right">
-    <div id="status-badge"><div class="dot"></div><span id="status-text">Carregando...</span></div>
-    <button class="btn-reload" onclick="loadData()">↻ Atualizar</button>
+  <div class="sidebar-bottom">
+    <div class="status-row">
+      <div class="dot"></div>
+      <span id="sidebar-status">Carregando...</span>
+    </div>
   </div>
-</header>
+</nav>
 
-<div class="container">
+<!-- MAIN -->
+<div class="main">
 
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Total Estratégias</div>
-      <div class="stat-value" id="stat-total">—</div>
-      <div class="stat-sub">geradas pela análise</div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="btn btn-ghost" onclick="toggleSidebar()" style="padding:7px 10px">☰</button>
+      <div>
+        <div class="page-title" id="topbar-title">Visão Geral</div>
+        <div class="page-sub" id="topbar-sub">Dashboard analítico em tempo real</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Confiança Média</div>
-      <div class="stat-value" id="stat-avg-conf" style="color:var(--accent2)">—</div>
-      <div class="stat-sub">% média do catálogo</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Alta Confiança</div>
-      <div class="stat-value" id="stat-high" style="color:var(--green)">—</div>
-      <div class="stat-sub">≥ 90%</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Sinais Hoje</div>
-      <div class="stat-value" id="stat-signals" style="color:var(--red)">—</div>
-      <div class="stat-sub">do log de sinais</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Seq. 4 Cores</div>
-      <div class="stat-value" id="stat-s4">—</div>
-      <div class="stat-sub">estratégias</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Seq. 5 Cores</div>
-      <div class="stat-value" id="stat-s5">—</div>
-      <div class="stat-sub">estratégias</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Seq. 6 Cores</div>
-      <div class="stat-value" id="stat-s6">—</div>
-      <div class="stat-sub">estratégias</div>
+    <div class="topbar-right">
+      <span id="last-update">—</span>
+      <button class="btn btn-ghost" onclick="loadData()">↻ Atualizar</button>
+      <button class="btn btn-primary" onclick="loadData()">⚡ Live</button>
     </div>
   </div>
 
-  <!-- Active signals banner -->
-  <div id="signals-banner">
-    <h3>🚨 Últimos Sinais Detectados</h3>
-    <div class="signal-list" id="signal-pills"></div>
+  <!-- ═══════════════ PAGE: OVERVIEW ═══════════════ -->
+  <div class="page active" id="page-overview">
+    <div style="padding:24px">
+
+      <!-- Signal Alert -->
+      <div id="signal-alert">
+        <div class="alert-header">
+          <span class="alert-badge">🚨 AO VIVO</span>
+          <span class="alert-title">Sinais Recentes Detectados</span>
+        </div>
+        <div class="signal-pills" id="alert-pills"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🧠</div>
+          <div class="stat-label">Total Estratégias</div>
+          <div class="stat-value" id="s-total">—</div>
+          <div class="stat-sub">no catálogo</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">💚</div>
+          <div class="stat-label">Alta Confiança</div>
+          <div class="stat-value" id="s-high" style="color:var(--green)">—</div>
+          <div class="stat-sub">≥ 90%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-label">Conf. Média</div>
+          <div class="stat-value" id="s-avg" style="color:var(--accent2)">—</div>
+          <div class="stat-sub">do catálogo</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-label">Sinais Hoje</div>
+          <div class="stat-value" id="s-today" style="color:var(--red)">—</div>
+          <div class="stat-sub">detectados</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">4️⃣</div>
+          <div class="stat-label">Seq. 4 Cores</div>
+          <div class="stat-value" id="s-4" style="color:var(--blue)">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">5️⃣</div>
+          <div class="stat-label">Seq. 5 Cores</div>
+          <div class="stat-value" id="s-5" style="color:var(--yellow)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">6️⃣</div>
+          <div class="stat-label">Seq. 6 Cores</div>
+          <div class="stat-value" id="s-6">—</div>
+        </div>
+      </div>
+
+      <!-- Charts row 1 -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Distribuição por Confiança</div>
+          <div class="chart-sub">Quantidade de estratégias por faixa</div>
+          <div class="chart-wrap" style="height:180px">
+            <canvas id="chart-conf-dist"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Cor Prevista</div>
+          <div class="chart-sub">Estratégias por cor alvo</div>
+          <div class="chart-wrap" style="height:180px">
+            <canvas id="chart-color-pie"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Tamanho de Sequência</div>
+          <div class="chart-sub">Estratégias por tamanho</div>
+          <div class="chart-wrap" style="height:180px">
+            <canvas id="chart-size-bar"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row 2 -->
+      <div class="charts-row-2">
+        <div class="chart-card">
+          <div class="chart-title">Top 10 — Confiança Máxima</div>
+          <div class="chart-sub">Estratégias com maior % de acerto histórico</div>
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="chart-top10"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Sinais por Hora</div>
+          <div class="chart-sub">Distribuição temporal de hoje</div>
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="chart-signals-hour"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <div class="search-wrap">
-      <input class="search-box" id="search" type="text" placeholder="Buscar sequência... ex: PRETO → VERMELHO">
-    </div>
-    <div class="filter-group">
-      <label>Tamanho</label>
-      <select id="filter-size">
-        <option value="all">Todos</option>
-        <option value="4">4 cores</option>
-        <option value="5">5 cores</option>
-        <option value="6">6 cores</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Apostar em</label>
-      <select id="filter-color">
-        <option value="all">Todas</option>
-        <option value="preto">⚫ Preto</option>
-        <option value="vermelho">🔴 Vermelho</option>
-        <option value="branco">⚪ Branco</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Confiança mín: <span id="conf-label">70%</span></label>
-      <input type="range" id="filter-conf" min="70" max="100" value="70" step="1">
-    </div>
-    <div class="filter-group">
-      <label>Ordenar por</label>
-      <select id="sort-by">
-        <option value="confidence">Confiança</option>
-        <option value="occurrences">Ocorrências</option>
-        <option value="sequence_size">Tamanho</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('strategies', this)">📊 Estratégias</div>
-    <div class="tab" onclick="switchTab('signals', this)">🚨 Sinais</div>
-  </div>
-
-  <!-- Tab: Strategies -->
-  <div id="tab-strategies">
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Sequência</th>
-            <th>Apostar em</th>
-            <th class="sorted" onclick="sortBy('confidence')">Confiança <span class="sort-icon">▼</span></th>
-            <th>Distribuição</th>
-            <th onclick="sortBy('occurrences')">Ocorrências <span class="sort-icon">↕</span></th>
-            <th>Tamanho</th>
-          </tr>
-        </thead>
-        <tbody id="strategies-tbody"></tbody>
-      </table>
-    </div>
-    <div id="empty-state" class="empty" style="display:none">
-      <div class="empty-icon">🔍</div>
-      <p>Nenhuma estratégia encontrada com os filtros atuais.</p>
+  <!-- ═══════════════ PAGE: STRATEGIES ═══════════════ -->
+  <div class="page" id="page-strategies">
+    <div style="padding:24px">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">🧠 Catálogo de Estratégias</div>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <input class="search-input" id="strat-search" type="text" placeholder="Buscar sequência...">
+            </div>
+            <select class="filter-sel" id="strat-size">
+              <option value="all">Todos tamanhos</option>
+              <option value="4">4 cores</option>
+              <option value="5">5 cores</option>
+              <option value="6">6 cores</option>
+            </select>
+            <select class="filter-sel" id="strat-color">
+              <option value="all">Todas cores</option>
+              <option value="preto">⚫ Preto</option>
+              <option value="vermelho">🔴 Vermelho</option>
+              <option value="branco">⚪ Branco</option>
+            </select>
+            <div class="conf-range-wrap">
+              Conf ≥ <span id="conf-val">70%</span>
+              <input type="range" id="strat-conf" min="70" max="100" value="70">
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Sequência</th>
+              <th>Apostar em</th>
+              <th onclick="sortStrats('confidence')">Confiança ↕</th>
+              <th>Distribuição</th>
+              <th onclick="sortStrats('occurrences')">Ocorrências ↕</th>
+              <th>Tam.</th>
+            </tr>
+          </thead>
+          <tbody id="strat-tbody"></tbody>
+        </table>
+        <div id="strat-empty" class="empty" style="display:none">
+          <div class="empty-icon">🔍</div>
+          <p>Nenhuma estratégia com esses filtros.</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tab: Signals -->
-  <div id="tab-signals" style="display:none">
-    <div class="table-wrap">
-      <div class="signals-full" id="signals-list"></div>
+  <!-- ═══════════════ PAGE: SIGNALS ═══════════════ -->
+  <div class="page" id="page-signals">
+    <div style="padding:24px">
+      <div class="section-header">
+        <div class="section-title">🚨 Histórico de Sinais</div>
+        <div class="section-sub">Últimas sequências detectadas em tempo real</div>
+      </div>
+      <div id="signals-list"></div>
+      <div id="signals-empty" class="empty" style="display:none">
+        <div class="empty-icon">📭</div>
+        <p>Nenhum sinal registrado ainda.</p>
+      </div>
     </div>
   </div>
 
-</div><!-- /container -->
+  <!-- ═══════════════ PAGE: HEATMAP ═══════════════ -->
+  <div class="page" id="page-heatmap">
+    <div style="padding:24px">
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="chart-card">
+          <div class="chart-title">🔥 Heatmap — Sequências × Cor Alvo</div>
+          <div class="chart-sub">Calor = confiança média das estratégias</div>
+          <div style="margin-top:8px">
+            <div class="hm-header">
+              <div class="hm-label">PRETO</div>
+              <div class="hm-label">VERM.</div>
+              <div class="hm-label">BRANCO</div>
+            </div>
+            <div id="heatmap-grid"></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">📊 Ocorrências por Padrão</div>
+          <div class="chart-sub">Top 12 sequências mais comuns</div>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="chart-occ-top"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🎯 Confiança vs Ocorrências</div>
+          <div class="chart-sub">Scatter — volume vs qualidade</div>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="chart-scatter"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
 
 <script>
-let allStrategies = [];
-let allSignals    = [];
-let currentSort  = 'confidence';
-let currentTab   = 'strategies';
+/* ═══════════ GLOBAL STATE ═══════════ */
+let strats = [];
+let signals = [];
+let sortField = 'confidence';
+let charts = {};
 
-/* ── Load Data ─────────────────────────── */
+/* ═══════════ NAVIGATION ═══════════ */
+const pageMap = {
+  overview:   {title:'Visão Geral',   sub:'Dashboard analítico em tempo real'},
+  strategies: {title:'Estratégias',   sub:'Catálogo completo de padrões'},
+  signals:    {title:'Sinais',        sub:'Histórico de detecções'},
+  heatmap:    {title:'Heatmap',       sub:'Mapa de calor de padrões'},
+};
+function navigate(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbar-title').textContent = pageMap[name].title;
+  document.getElementById('topbar-sub').textContent   = pageMap[name].sub;
+  if (name === 'heatmap') renderHeatmapPage();
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* ═══════════ LOAD DATA ═══════════ */
 async function loadData() {
-  document.getElementById('status-text').textContent = 'Carregando...';
   try {
-    const [stratRes, sigRes] = await Promise.allSettled([
-      fetch('../data/strategies.json').then(r => r.json()),
-      fetch('../data/signals_log.json').then(r => r.json()),
+    const [sa, sl] = await Promise.allSettled([
+      fetch('../data/strategies.json').then(r=>r.json()),
+      fetch('../data/signals_log.json').then(r=>r.json()),
     ]);
-
-    allStrategies = stratRes.status === 'fulfilled' ? stratRes.value : [];
-    allSignals    = sigRes.status   === 'fulfilled' ? sigRes.value   : [];
-
-    updateStats();
-    renderStrategies();
-    renderSignals();
-    renderSignalBanner();
-    document.getElementById('status-text').textContent =
-      `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}`;
+    strats  = sa.status==='fulfilled' ? sa.value : [];
+    signals = sl.status==='fulfilled' ? sl.value : [];
+    updateAll();
+    document.getElementById('last-update').textContent =
+      'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('sidebar-status').textContent =
+      strats.length + ' estratégias';
   } catch(e) {
-    document.getElementById('status-text').textContent = 'Erro ao carregar dados';
-    console.error(e);
+    document.getElementById('sidebar-status').textContent = 'Erro';
   }
 }
 
-/* ── Stats ──────────────────────────────── */
+function updateAll() {
+  updateStats();
+  renderSignalAlert();
+  renderCharts();
+  renderStrategies();
+  renderSignals();
+  document.getElementById('nb-strats').textContent  = strats.length;
+  document.getElementById('nb-signals').textContent = signals.length;
+}
+
+/* ═══════════ STATS ═══════════ */
 function updateStats() {
-  const s = allStrategies;
-  document.getElementById('stat-total').textContent = s.length;
-  if (s.length) {
-    const avg = (s.reduce((a,b) => a + b.confidence, 0) / s.length).toFixed(1);
-    document.getElementById('stat-avg-conf').textContent = avg + '%';
-  }
-  document.getElementById('stat-high').textContent = s.filter(x => x.confidence >= 90).length;
-
+  const s = strats;
+  document.getElementById('s-total').textContent = s.length;
+  document.getElementById('s-high').textContent  = s.filter(x=>x.confidence>=90).length;
+  document.getElementById('s-avg').textContent   =
+    s.length ? (s.reduce((a,b)=>a+b.confidence,0)/s.length).toFixed(1)+'%' : '—';
   const today = new Date().toISOString().slice(0,10);
-  document.getElementById('stat-signals').textContent =
-    allSignals.filter(x => x.logged_at && x.logged_at.startsWith(today)).length;
-
-  [4,5,6].forEach(n => {
-    document.getElementById(`stat-s${n}`).textContent = s.filter(x => x.sequence_size === n).length;
-  });
+  document.getElementById('s-today').textContent =
+    signals.filter(x=>x.logged_at&&x.logged_at.startsWith(today)).length;
+  [4,5,6].forEach(n=>
+    document.getElementById('s-'+n).textContent = s.filter(x=>x.sequence_size===n).length
+  );
 }
 
-/* ── Signals Banner ─────────────────────── */
-function renderSignalBanner() {
-  const banner = document.getElementById('signals-banner');
-  const pills  = document.getElementById('signal-pills');
-  const recent = allSignals.slice(0, 8);
-  if (!recent.length) { banner.classList.remove('visible'); return; }
-  banner.classList.add('visible');
-  pills.innerHTML = recent.map(s => {
-    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
-    const t = s.logged_at ? new Date(s.logged_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+/* ═══════════ SIGNAL ALERT ═══════════ */
+function renderSignalAlert() {
+  const recent = signals.slice(0,6);
+  const box = document.getElementById('signal-alert');
+  if (!recent.length) { box.classList.remove('visible'); return; }
+  box.classList.add('visible');
+  const emoji = {preto:'⚫',vermelho:'🔴',branco:'⚪'};
+  document.getElementById('alert-pills').innerHTML = recent.map(s=>{
+    const t = s.logged_at
+      ? new Date(s.logged_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+      : '';
     return `<div class="signal-pill ${s.predict_color}">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.8rem">${s.sequence_str}</span>
-      <span>${e} ${s.predict_color.toUpperCase()}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem">${s.sequence_str||'—'}</span>
+      <span>${emoji[s.predict_color]||'?'} <b>${(s.predict_color||'').toUpperCase()}</b></span>
       <span style="color:var(--accent2);font-weight:700">${s.confidence}%</span>
-      ${t ? `<span style="color:var(--muted);font-size:.72rem">${t}</span>` : ''}
+      ${t?`<span style="color:var(--muted)">${t}</span>`:''}
     </div>`;
   }).join('');
 }
 
-/* ── Filter & Render Strategies ─────────── */
-function getFiltered() {
-  const search    = document.getElementById('search').value.toLowerCase();
-  const size      = document.getElementById('filter-size').value;
-  const color     = document.getElementById('filter-color').value;
-  const minConf   = parseFloat(document.getElementById('filter-conf').value);
-  const sortField = document.getElementById('sort-by').value;
+/* ═══════════ CHARTS ═══════════ */
+const C = Chart;
+const FONT = "'Inter', sans-serif";
 
-  let data = allStrategies.filter(s => {
-    if (s.confidence < minConf) return false;
-    if (size  !== 'all' && s.sequence_size !== parseInt(size)) return false;
-    if (color !== 'all' && s.predict_color !== color) return false;
-    if (search && !s.sequence_str.toLowerCase().includes(search)) return false;
-    return true;
-  });
-
-  data.sort((a,b) => b[sortField] - a[sortField]);
-  return data;
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
 }
+
+function renderCharts() {
+  renderConfDist();
+  renderColorPie();
+  renderSizeBar();
+  renderTop10();
+  renderSignalsHour();
+}
+
+/* Confidence distribution */
+function renderConfDist() {
+  destroyChart('conf-dist');
+  const buckets = {'70-79':0,'80-89':0,'90-94':0,'95-99':0,'100':0};
+  strats.forEach(s=>{
+    if(s.confidence<80)       buckets['70-79']++;
+    else if(s.confidence<90)  buckets['80-89']++;
+    else if(s.confidence<95)  buckets['90-94']++;
+    else if(s.confidence<100) buckets['95-99']++;
+    else                      buckets['100']++;
+  });
+  const ctx = document.getElementById('chart-conf-dist').getContext('2d');
+  charts['conf-dist'] = new C(ctx,{
+    type:'bar',
+    data:{
+      labels:Object.keys(buckets),
+      datasets:[{
+        data:Object.values(buckets),
+        backgroundColor:['#3b82f680','#f59e0b80','#22c55e80','#a855f780','#7c3aed'],
+        borderColor:['#3b82f6','#f59e0b','#22c55e','#a855f7','#7c3aed'],
+        borderWidth:2,borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+' estratégias'}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'}},
+        y:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+/* Color pie */
+function renderColorPie() {
+  destroyChart('color-pie');
+  const cnt = {preto:0,vermelho:0,branco:0};
+  strats.forEach(s=>{ if(cnt[s.predict_color]!==undefined) cnt[s.predict_color]++; });
+  const ctx = document.getElementById('chart-color-pie').getContext('2d');
+  charts['color-pie'] = new C(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['⚫ Preto','🔴 Vermelho','⚪ Branco'],
+      datasets:[{
+        data:[cnt.preto,cnt.vermelho,cnt.branco],
+        backgroundColor:['#47556980','#ef444480','#94a3b880'],
+        borderColor:['#475569','#ef4444','#94a3b8'],
+        borderWidth:2,hoverOffset:8,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#94a3b8',font:{family:FONT,size:10},padding:10}},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}`}}
+      }
+    }
+  });
+}
+
+/* Size bar */
+function renderSizeBar() {
+  destroyChart('size-bar');
+  const cnt = {4:0,5:0,6:0};
+  strats.forEach(s=>{ if(cnt[s.sequence_size]!==undefined) cnt[s.sequence_size]++; });
+  const ctx = document.getElementById('chart-size-bar').getContext('2d');
+  charts['size-bar'] = new C(ctx,{
+    type:'bar',
+    data:{
+      labels:['4 cores','5 cores','6 cores'],
+      datasets:[{
+        data:[cnt[4],cnt[5],cnt[6]],
+        backgroundColor:['#3b82f680','#f59e0b80','#a855f780'],
+        borderColor:['#3b82f6','#f59e0b','#a855f7'],
+        borderWidth:2,borderRadius:8,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'}},
+        y:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+/* Top 10 */
+function renderTop10() {
+  destroyChart('top10');
+  const top = [...strats].sort((a,b)=>b.confidence-a.confidence).slice(0,10);
+  const colorMap = {preto:'#47556980',vermelho:'#ef444480',branco:'#94a3b880'};
+  const borderMap = {preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
+  const ctx = document.getElementById('chart-top10').getContext('2d');
+  charts['top10'] = new C(ctx,{
+    type:'bar',
+    data:{
+      labels:top.map(s=>s.sequence_str.length>30?s.sequence_str.substring(0,28)+'…':s.sequence_str),
+      datasets:[{
+        data:top.map(s=>s.confidence),
+        backgroundColor:top.map(s=>colorMap[s.predict_color]||'#7c3aed80'),
+        borderColor:top.map(s=>borderMap[s.predict_color]||'#7c3aed'),
+        borderWidth:2,borderRadius:5,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}% confiança`}}},
+      scales:{
+        x:{min:70,max:100,ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},
+           title:{display:true,text:'Confiança (%)',color:'#64748b',font:{size:10}}},
+        y:{ticks:{color:'#94a3b8',font:{family:FONT,size:9}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+/* Signals per hour */
+function renderSignalsHour() {
+  destroyChart('signals-hour');
+  const hrs = Array(24).fill(0);
+  const today = new Date().toISOString().slice(0,10);
+  signals
+    .filter(s=>s.logged_at&&s.logged_at.startsWith(today))
+    .forEach(s=>{ const h=new Date(s.logged_at).getHours(); hrs[h]++; });
+  const labels = Array.from({length:24},(_,i)=>i.toString().padStart(2,'0')+'h');
+  const ctx = document.getElementById('chart-signals-hour').getContext('2d');
+  charts['signals-hour'] = new C(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        data:hrs,
+        borderColor:'#7c3aed',
+        backgroundColor:'rgba(124,58,237,0.15)',
+        fill:true,tension:0.4,pointRadius:3,
+        pointBackgroundColor:'#a855f7',
+        borderWidth:2,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'}},
+        y:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},beginAtZero:true,
+           title:{display:true,text:'Sinais',color:'#64748b',font:{size:9}}}
+      }
+    }
+  });
+}
+
+/* ═══════════ STRATEGIES TABLE ═══════════ */
+function getFiltered() {
+  const q    = document.getElementById('strat-search').value.toLowerCase();
+  const sz   = document.getElementById('strat-size').value;
+  const cl   = document.getElementById('strat-color').value;
+  const mn   = parseFloat(document.getElementById('strat-conf').value);
+  return [...strats]
+    .filter(s=>{
+      if(s.confidence < mn) return false;
+      if(sz!=='all'&&s.sequence_size!==parseInt(sz)) return false;
+      if(cl!=='all'&&s.predict_color!==cl) return false;
+      if(q&&!s.sequence_str.toLowerCase().includes(q)) return false;
+      return true;
+    })
+    .sort((a,b)=>b[sortField]-a[sortField]);
+}
+
+function sortStrats(f){ sortField=f; renderStrategies(); }
 
 function renderStrategies() {
   const data  = getFiltered();
-  const tbody = document.getElementById('strategies-tbody');
-  const empty = document.getElementById('empty-state');
-  const table = document.querySelector('.table-wrap');
-
-  if (!data.length) {
-    tbody.innerHTML = '';
-    empty.style.display  = 'block';
-    table.style.display  = 'none';
-    return;
+  const tbody = document.getElementById('strat-tbody');
+  const empty = document.getElementById('strat-empty');
+  const tcard = document.querySelector('.table-card table');
+  if(!data.length){
+    tbody.innerHTML=''; empty.style.display='block'; tcard.style.display='none'; return;
   }
-  empty.style.display  = 'none';
-  table.style.display  = '';
-
-  tbody.innerHTML = data.map((s, i) => {
-    const chips = s.sequence.map(c =>
-      `<span class="chip ${c}">${c.substring(0,3).toUpperCase()}</span>`
-    ).join('<span class="arrow">›</span>');
-
-    const confClass = s.confidence >= 90 ? 'high' : s.confidence >= 80 ? 'medium' : 'low';
-    const confColor = s.confidence >= 90 ? 'var(--green)' : s.confidence >= 80 ? '#f59e0b' : 'var(--red)';
-
-    const maxDist = Math.max(...Object.values(s.distribution));
-    const distBars = Object.entries(s.distribution).map(([c, p]) => {
-      const h = Math.max(4, Math.round(p / maxDist * 28));
-      return `<div class="dist-col">
-        <div class="dist-bar ${c}" style="height:${h}px" title="${c}: ${p}%"></div>
-        <div class="dist-lbl">${c.substring(0,3).toUpperCase()}</div>
-      </div>`;
+  empty.style.display='none'; tcard.style.display='';
+  const emo={preto:'⚫',vermelho:'🔴',branco:'⚪'};
+  tbody.innerHTML=data.map((s,i)=>{
+    const chips=s.sequence.map(c=>`<span class="chip ${c}">${c.substring(0,3).toUpperCase()}</span>`).join('<span class="arrow">›</span>');
+    const cc=s.confidence>=90?'high':s.confidence>=80?'med':'low';
+    const cv=s.confidence>=90?'var(--green)':s.confidence>=80?'var(--yellow)':'var(--red)';
+    const mx=Math.max(...Object.values(s.distribution||{preto:0}));
+    const dist=Object.entries(s.distribution||{}).map(([c,p])=>{
+      const h=Math.max(3,Math.round(p/mx*26));
+      return `<div class="dm-col"><div class="dm-bar ${c}" style="height:${h}px" title="${c}: ${p}%"></div><div class="dm-lbl">${c.substring(0,3).toUpperCase()}</div></div>`;
     }).join('');
-
-    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
-
     return `<tr>
-      <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
+      <td style="color:var(--muted);font-size:.72rem">${i+1}</td>
       <td><div class="seq-chips">${chips}</div></td>
-      <td><span class="predict-badge ${s.predict_color}">${e} ${s.predict_color.toUpperCase()}</span></td>
-      <td>
-        <div class="conf-wrap">
-          <span class="conf-pct" style="color:${confColor}">${s.confidence}%</span>
-          <div class="conf-bar-bg"><div class="conf-bar ${confClass}" style="width:${s.confidence}%"></div></div>
-        </div>
-      </td>
-      <td><div class="dist-bars">${distBars}</div></td>
-      <td><span class="occ-badge">${s.occurrences}×</span></td>
-      <td style="color:var(--muted);font-size:.8rem">${s.sequence_size} cores</td>
+      <td><span class="predict-badge ${s.predict_color}">${emo[s.predict_color]||'?'} ${(s.predict_color||'').toUpperCase()}</span></td>
+      <td><div class="conf-cell">
+        <span class="conf-num" style="color:${cv}">${s.confidence}%</span>
+        <div class="conf-bar-bg"><div class="conf-bar ${cc}" style="width:${s.confidence}%"></div></div>
+      </div></td>
+      <td><div class="dist-mini">${dist}</div></td>
+      <td><span class="occ">${s.occurrences}×</span></td>
+      <td style="color:var(--muted);font-size:.75rem">${s.sequence_size}c</td>
     </tr>`;
   }).join('');
 }
 
-/* ── Render Signals Tab ─────────────────── */
+/* ═══════════ SIGNALS LIST ═══════════ */
 function renderSignals() {
-  const list = document.getElementById('signals-list');
-  if (!allSignals.length) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Nenhum sinal registrado ainda.</p></div>';
-    return;
-  }
-  list.innerHTML = allSignals.slice(0, 100).map(s => {
-    const e = {preto:'⚫', vermelho:'🔴', branco:'⚪'}[s.predict_color] || '?';
-    const t = s.logged_at ? new Date(s.logged_at).toLocaleString('pt-BR') : '—';
-    const dist = Object.entries(s.distribution || {})
-      .map(([c,p]) => `<span style="opacity:.7">${c.substring(0,3).toUpperCase()}: <b>${p}%</b></span>`)
-      .join(' &nbsp;|&nbsp; ');
+  const list  = document.getElementById('signals-list');
+  const empty = document.getElementById('signals-empty');
+  if(!signals.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const emo={preto:'⚫',vermelho:'🔴',branco:'⚪'};
+  list.innerHTML=signals.slice(0,100).map(s=>{
+    const t=s.logged_at?new Date(s.logged_at).toLocaleString('pt-BR'):'—';
+    const dist=Object.entries(s.distribution||{}).map(([c,p])=>
+      `<span style="font-size:.72rem;color:var(--muted2)">${c.substring(0,3).toUpperCase()}: <b style="color:var(--text)">${p}%</b></span>`
+    ).join('<span style="color:var(--muted);margin:0 5px">|</span>');
     return `<div class="signal-card ${s.predict_color}">
       <div>
-        <div class="signal-seq">${s.sequence_str}</div>
-        <div class="signal-meta" style="margin-top:6px">${dist}</div>
+        <div class="sc-seq">${s.sequence_str||'—'}</div>
+        <div class="sc-meta" style="margin-top:6px">${dist}</div>
       </div>
-      <div class="signal-meta">
-        <span class="predict-badge ${s.predict_color}">${e} ${s.predict_color.toUpperCase()}</span>
-        <span class="conf-pct" style="color:var(--accent2)">${s.confidence}%</span>
-        <span class="occ-badge">${s.occurrences}×</span>
-        <span class="signal-time">${t}</span>
+      <div class="sc-meta">
+        <span class="predict-badge ${s.predict_color}">${emo[s.predict_color]||'?'} ${(s.predict_color||'').toUpperCase()}</span>
+        <span style="color:var(--accent2);font-weight:700;font-size:.85rem">${s.confidence}%</span>
+        <span class="occ">${s.occurrences}×</span>
+        <span class="sc-time">${t}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-/* ── Tabs ────────────────────────────────── */
-function switchTab(name, el) {
-  currentTab = name;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-strategies').style.display = name === 'strategies' ? '' : 'none';
-  document.getElementById('tab-signals').style.display    = name === 'signals'    ? '' : 'none';
+/* ═══════════ HEATMAP ═══════════ */
+function renderHeatmapPage() {
+  renderHeatmapGrid();
+  renderOccTop();
+  renderScatter();
 }
 
-/* ── Sort ────────────────────────────────── */
-function sortBy(field) {
-  currentSort = field;
-  document.getElementById('sort-by').value = field;
-  renderStrategies();
+function renderHeatmapGrid() {
+  const sizes=[4,5,6];
+  const colors=['preto','vermelho','branco'];
+  let html='';
+  sizes.forEach(sz=>{
+    colors.forEach(cl=>{
+      const group=strats.filter(s=>s.sequence_size===sz&&s.predict_color===cl);
+      const avg=group.length?(group.reduce((a,b)=>a+b.confidence,0)/group.length):0;
+      const alpha=avg?Math.max(0.15,(avg-70)/30):0;
+      const clr=cl==='vermelho'?`rgba(239,68,68,${alpha})`:
+                  cl==='preto'  ?`rgba(71,85,105,${alpha})`:
+                                 `rgba(148,163,184,${alpha})`;
+      const border=cl==='vermelho'?`#ef4444`:cl==='preto'?`#475569`:`#94a3b8`;
+      html+=`<div class="hm-cell" style="background:${clr};border-color:${avg?border:'transparent'}" title="${sz} cores → ${cl}: ${avg?avg.toFixed(1)+'%':'-'}">
+        ${avg?avg.toFixed(0):'—'}
+      </div>`;
+    });
+  });
+  document.getElementById('heatmap-grid').innerHTML=html;
 }
 
-/* ── Events ──────────────────────────────── */
-document.getElementById('search').addEventListener('input', renderStrategies);
-document.getElementById('filter-size').addEventListener('change', renderStrategies);
-document.getElementById('filter-color').addEventListener('change', renderStrategies);
-document.getElementById('sort-by').addEventListener('change', renderStrategies);
-document.getElementById('filter-conf').addEventListener('input', function() {
-  document.getElementById('conf-label').textContent = this.value + '%';
+function renderOccTop() {
+  destroyChart('occ-top');
+  const top=[...strats].sort((a,b)=>b.occurrences-a.occurrences).slice(0,12);
+  const colorMap={preto:'#47556980',vermelho:'#ef444480',branco:'#94a3b880'};
+  const borderMap={preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
+  const ctx=document.getElementById('chart-occ-top').getContext('2d');
+  charts['occ-top']=new C(ctx,{
+    type:'bar',
+    data:{
+      labels:top.map(s=>s.sequence_str.length>28?s.sequence_str.substring(0,26)+'…':s.sequence_str),
+      datasets:[{
+        data:top.map(s=>s.occurrences),
+        backgroundColor:top.map(s=>colorMap[s.predict_color]||'#7c3aed80'),
+        borderColor:top.map(s=>borderMap[s.predict_color]||'#7c3aed'),
+        borderWidth:2,borderRadius:4,
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},beginAtZero:true},
+        y:{ticks:{color:'#94a3b8',font:{family:FONT,size:8}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function renderScatter() {
+  destroyChart('scatter');
+  const sample=strats.slice(0,200);
+  const colorMap={preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
+  const datasets=[
+    {label:'⚫ Preto',   data:sample.filter(s=>s.predict_color==='preto').map(s=>({x:s.occurrences,y:s.confidence})),  backgroundColor:'#47556980',borderColor:'#475569',pointRadius:5},
+    {label:'🔴 Vermelho',data:sample.filter(s=>s.predict_color==='vermelho').map(s=>({x:s.occurrences,y:s.confidence})),backgroundColor:'#ef444480',borderColor:'#ef4444',pointRadius:5},
+    {label:'⚪ Branco',  data:sample.filter(s=>s.predict_color==='branco').map(s=>({x:s.occurrences,y:s.confidence})), backgroundColor:'#94a3b880',borderColor:'#94a3b8',pointRadius:5},
+  ];
+  const ctx=document.getElementById('chart-scatter').getContext('2d');
+  charts['scatter']=new C(ctx,{
+    type:'scatter',
+    data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{family:FONT,size:9},padding:8}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},
+           title:{display:true,text:'Ocorrências',color:'#64748b',font:{size:9}}},
+        y:{min:70,ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},
+           title:{display:true,text:'Confiança (%)',color:'#64748b',font:{size:9}}}
+      }
+    }
+  });
+}
+
+/* ═══════════ EVENTS ═══════════ */
+document.getElementById('strat-search').addEventListener('input',renderStrategies);
+document.getElementById('strat-size').addEventListener('change',renderStrategies);
+document.getElementById('strat-color').addEventListener('change',renderStrategies);
+document.getElementById('strat-conf').addEventListener('input',function(){
+  document.getElementById('conf-val').textContent=this.value+'%';
   renderStrategies();
 });
 
-/* ── Auto-refresh every 30s ─────────────── */
+/* ═══════════ INIT ═══════════ */
 loadData();
-setInterval(loadData, 30000);
+setInterval(loadData,30000);
 </script>
 </body>
 </html>

@@ -1,12 +1,20 @@
+# -*- coding: utf-8 -*-
 # coletor/blaze_collector.py
 # Coleta resultados do Blaze Double via WebSocket em tempo real
 # e insere no banco de dados local.
 
+import sys
+import os
 import asyncio
 import json
 import re
-import sys, os
+import io
 from datetime import datetime
+
+# Configurar stdout para UTF-8 no Windows
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
