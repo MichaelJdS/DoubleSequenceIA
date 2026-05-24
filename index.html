@@ -3,1235 +3,967 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DoubleSequenceIA — Dashboard</title>
-<meta name="description" content="Dashboard analítico em tempo real para o Double da Blaze com reconhecimento de padrões e IA de sequências."/>
+<title>DoubleSequenceIA — Monitor ao Vivo</title>
+<meta name="description" content="Monitor ao vivo do Double da Blaze com reconhecimento de padrões e IA de sequências."/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-  --bg:        #07070f;
-  --bg2:       #0e0e1a;
-  --bg3:       #161625;
-  --bg4:       #1e1e30;
-  --border:    #252538;
-  --accent:    #7c3aed;
-  --accent2:   #a855f7;
-  --accent3:   #c084fc;
-  --red:       #ef4444;
-  --red-soft:  #3d1515;
-  --green:     #22c55e;
-  --green-soft:#0d2e1a;
-  --yellow:    #f59e0b;
-  --yellow-soft:#2e2100;
-  --blue:      #3b82f6;
-  --text:      #e2e8f0;
-  --muted:     #64748b;
-  --muted2:    #94a3b8;
-  --card-glow: 0 0 40px rgba(124,58,237,0.08);
+  --bg:       #0a0a0f;
+  --bg2:      #0e0e1a;
+  --bg3:      #141420;
+  --bg4:      #1a1a28;
+  --border:   #1e2035;
+  --accent:   #7c3aed;
+  --accent2:  #a855f7;
+  --red:      #ef4444;
+  --green:    #22c55e;
+  --yellow:   #f59e0b;
+  --blue:     #3b82f6;
+  --text:     #e2e8f0;
+  --muted:    #555;
+  --muted2:   #64748b;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  position:fixed;left:0;top:0;bottom:0;width:220px;
-  background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;z-index:200;
-  transition:transform .3s;
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
 }
-.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
-.logo-icon{
-  width:40px;height:40px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;margin-bottom:10px;box-shadow:0 4px 16px rgba(124,58,237,0.4);
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
 }
-.logo-title{font-size:.95rem;font-weight:800;background:linear-gradient(90deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:.65rem;color:var(--muted);margin-top:2px}
-
-.nav{padding:16px 10px;flex:1}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:10px;
-  font-size:.82rem;font-weight:500;
-  color:var(--muted2);cursor:pointer;transition:all .2s;margin-bottom:3px;
-  border:1px solid transparent;
+.tab {
+  padding: 14px 20px;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--muted2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.nav-item:hover{background:var(--bg3);color:var(--text)}
-.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(168,85,247,.1));color:#fff;border-color:rgba(124,58,237,.4)}
-.nav-item .nav-icon{font-size:1rem;width:20px;text-align:center}
-.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px}
-
-.sidebar-bottom{padding:16px;border-top:1px solid var(--border)}
-.status-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
-.dot.offline{background:var(--red);box-shadow:0 0 8px var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ── MAIN ── */
-.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
-
-/* ── TOPBAR ── */
-.topbar{
-  height:60px;background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;position:sticky;top:0;z-index:100;
-  backdrop-filter:blur(12px);
+.tab:hover { color: var(--text); }
+.tab.active { color: #fff; border-bottom-color: var(--accent); }
+.tab-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: .58rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
 }
-.topbar-left{display:flex;align-items:center;gap:12px}
-.page-title{font-size:1rem;font-weight:700}
-.page-sub{font-size:.75rem;color:var(--muted)}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.btn{padding:7px 16px;border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border)}
-.btn-ghost{background:var(--bg3);color:var(--text)}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent2)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(124,58,237,.35)}
-.btn-primary:hover{box-shadow:0 4px 20px rgba(124,58,237,.6);transform:translateY(-1px)}
-.btn-danger{background:linear-gradient(135deg,#991b1b,#dc2626);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(220,38,38,.25)}
-.btn-danger:hover{box-shadow:0 4px 20px rgba(220,38,38,.5);transform:translateY(-1px)}
-#last-update{font-size:.72rem;color:var(--muted)}
-
-/* ── PAGE ── */
-.page{display:none;padding:24px;animation:fadeIn .3s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* ── SECTION HEADER ── */
-.section-header{margin-bottom:18px}
-.section-title{font-size:1.05rem;font-weight:700;margin-bottom:3px}
-.section-sub{font-size:.78rem;color:var(--muted)}
-
-/* ── LIVE PANEL ── */
-.live-panel{
-  background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(168,85,247,.06));
-  border:1px solid rgba(124,58,237,.35);
-  border-radius:18px;padding:20px 24px;margin-bottom:20px;
-  animation:fadeIn .4s ease;
+.tab-badge.live {
+  background: var(--red);
+  animation: blink 2s infinite;
 }
-.live-panel-title{
-  display:flex;align-items:center;gap:10px;margin-bottom:16px;
-}
-.live-badge{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;
-  animation:pulse 1.5s infinite;
-}
-.live-panel-title h2{font-size:.95rem;font-weight:700;color:var(--accent2)}
 
-/* Round history strip */
-.rounds-strip{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
-.round-ball{
-  width:46px;height:46px;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;font-weight:700;
-  border:2px solid transparent;transition:transform .2s;cursor:default;
-  position:relative;
-}
-.round-ball:hover{transform:scale(1.1)}
-.round-ball.preto{background:rgba(71,85,105,.25);border-color:#475569;color:#94a3b8}
-.round-ball.vermelho{background:rgba(239,68,68,.2);border-color:#ef4444;color:#f87171;box-shadow:0 0 10px rgba(239,68,68,.2)}
-.round-ball.branco{background:rgba(255,255,255,.1);border-color:#94a3b8;color:#e2e8f0}
-.round-ball.current{
-  border-width:3px;box-shadow:0 0 20px rgba(124,58,237,.5);
-  animation:currentPulse 1.5s infinite;
-}
-.round-ball.current.preto{border-color:#a855f7}
-.round-ball.current.vermelho{border-color:#f87171;box-shadow:0 0 20px rgba(239,68,68,.4)}
-.round-ball.current.branco{border-color:#c084fc}
-@keyframes currentPulse{0%,100%{box-shadow:0 0 14px rgba(124,58,237,.4)}50%{box-shadow:0 0 28px rgba(124,58,237,.8)}}
-.rb-num{font-size:.8rem;line-height:1}
-.rb-label{font-size:.5rem;text-transform:uppercase;opacity:.7;line-height:1}
-.rounds-strip-label{font-size:.7rem;color:var(--muted);margin-left:4px}
+.page { display: none; }
+.page.active { display: block; }
 
-/* Bet recommendation + stats row */
-.live-bottom{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-top:4px}
-.live-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:14px;padding:14px 16px;
-  transition:transform .2s,box-shadow .2s;
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0;
+  flex-wrap: wrap;
+  gap: 10px;
 }
-.live-card:hover{transform:translateY(-2px);box-shadow:var(--card-glow)}
-.lc-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
-.lc-value{font-size:1.5rem;font-weight:900;line-height:1}
-.lc-sub{font-size:.68rem;color:var(--muted);margin-top:4px}
-
-.bet-card{
-  background:var(--bg2);border:2px solid var(--accent);
-  border-radius:14px;padding:14px 16px;
-  box-shadow:0 0 20px rgba(124,58,237,.15);
+.header-left h1 {
+  font-size: 1.3rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #fff, var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.bet-card.vermelho{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.2)}
-.bet-card.preto{border-color:#475569}
-.bet-card.branco{border-color:#94a3b8}
-.bet-card.none{border-color:var(--border);opacity:.6}
-.bet-color-display{
-  font-size:2rem;font-weight:900;letter-spacing:-.02em;
-  display:flex;align-items:center;gap:8px;margin-bottom:4px;
+.header-left p { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+.btn {
+  padding: 8px 16px;
+  border-radius: 9px;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text);
+  transition: all .2s;
 }
-.bet-color-display.vermelho{color:#f87171}
-.bet-color-display.preto{color:#94a3b8}
-.bet-color-display.branco{color:#e2e8f0}
-.bet-color-display.none{color:var(--muted);font-size:1rem}
-.bet-conf{font-size:.72rem;color:var(--accent2);font-weight:700}
-
-/* Win/Loss streak */
-.streak-win{color:var(--green);font-weight:900}
-.streak-loss{color:var(--red);font-weight:900}
-.winrate-val{color:var(--green);font-weight:900}
-.winrate-val.low{color:var(--red)}
-.winrate-val.mid{color:var(--yellow)}
-
-/* History pills */
-.hist-pills{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
-.hist-pill{
-  width:14px;height:14px;border-radius:3px;
-  display:inline-block;transition:transform .1s;
+.btn:hover { border-color: var(--accent); color: var(--accent2); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(124,58,237,.3);
 }
-.hist-pill:hover{transform:scale(1.3)}
-.hist-pill.win{background:var(--green)}
-.hist-pill.loss{background:var(--red)}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,.5); }
+.btn-win  { background: rgba(34,197,94,.1);  border-color: var(--green);  color: var(--green); }
+.btn-win:hover  { background: rgba(34,197,94,.2);  color: var(--green); }
+.btn-loss { background: rgba(239,68,68,.1);  border-color: var(--red);    color: var(--red); }
+.btn-loss:hover { background: rgba(239,68,68,.2);  color: var(--red); }
+.btn-reset { background: rgba(100,116,139,.1); border-color: var(--muted2); color: var(--muted2); }
+.btn-reset:hover { background: rgba(100,116,139,.2); color: var(--text); }
+.btn-pause { background: rgba(168,85,247,.1); border-color: var(--accent2); color: var(--accent2); }
+.btn-pause:hover { background: rgba(168,85,247,.2); }
 
-/* Reset button area */
-.reset-area{display:flex;align-items:center;gap:8px;margin-top:10px}
-
-/* ── STAT CARDS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:16px;padding:18px 20px;
-  position:relative;overflow:hidden;
-  transition:transform .2s,border-color .2s,box-shadow .2s;cursor:default;
+/* ── LIVE PAGE ── */
+#page-live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 16px;
+  max-width: 760px;
+  margin: 0 auto;
 }
-.stat-card:hover{transform:translateY(-3px);box-shadow:var(--card-glow);border-color:var(--accent)}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.stat-card.green::before{background:linear-gradient(90deg,var(--green),#4ade80)}
-.stat-card.red::before{background:linear-gradient(90deg,var(--red),#f87171)}
-.stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),#fbbf24)}
-.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),#60a5fa)}
-.stat-icon{font-size:1.4rem;margin-bottom:8px}
-.stat-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
-.stat-value{font-size:2rem;font-weight:900;line-height:1}
-.stat-sub{font-size:.7rem;color:var(--muted);margin-top:4px}
-.stat-trend{position:absolute;top:16px;right:16px;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:6px}
-.stat-trend.up{background:var(--green-soft);color:var(--green)}
-.stat-trend.down{background:var(--red-soft);color:var(--red)}
 
-/* ── CHARTS ROW ── */
-.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px}
-.charts-row-2{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:24px}
-.chart-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:16px;padding:20px;
-  transition:border-color .2s,box-shadow .2s;
+/* Rounds */
+.section-label {
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 8px;
 }
-.chart-card:hover{border-color:rgba(124,58,237,.4);box-shadow:var(--card-glow)}
-.chart-title{font-size:.85rem;font-weight:700;margin-bottom:4px}
-.chart-sub{font-size:.7rem;color:var(--muted);margin-bottom:16px}
-.chart-wrap{position:relative;width:100%}
+.rounds-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  width: 100%;
+}
+.ball {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  border: 2px solid transparent;
+  transition: transform .2s;
+  cursor: default;
+}
+.ball:hover { transform: scale(1.1); }
+.ball.preto   { background: #1a1f2e; border-color: #334155; color: #94a3b8; }
+.ball.vermelho { background: #2d1515; border-color: #ef4444; color: #f87171; box-shadow: 0 0 12px rgba(239,68,68,.25); }
+.ball.branco  { background: #1e2535; border-color: #64748b; color: #cbd5e1; }
+.ball.latest {
+  border-width: 3px;
+  animation: latestPulse 1.5s infinite;
+}
+.ball.latest.preto   { border-color: #818cf8; box-shadow: 0 0 18px rgba(129,140,248,.4); }
+.ball.latest.vermelho{ border-color: #f87171; box-shadow: 0 0 22px rgba(248,113,113,.5); }
+.ball.latest.branco  { border-color: #c084fc; box-shadow: 0 0 18px rgba(192,132,252,.3); }
+@keyframes latestPulse {
+  0%,100% { box-shadow: 0 0 12px rgba(129,140,248,.3); }
+  50%      { box-shadow: 0 0 28px rgba(129,140,248,.7); }
+}
+.ball-num { font-size: 1rem; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+.ball-lbl { font-size: .42rem; text-transform: uppercase; opacity: .7; margin-top: 1px; }
 
-/* ── SIGNAL ALERT ── */
-#signal-alert{
-  display:none;
-  background:linear-gradient(135deg,#1a0a2e,#0a1a2e);
-  border:1px solid var(--accent);border-radius:16px;
-  padding:16px 20px;margin-bottom:20px;animation:slideDown .4s ease;
+/* Signal box */
+.signal-box {
+  width: 100%;
+  border-radius: 18px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border: 2px solid var(--border);
+  background: var(--bg2);
+  transition: all .4s;
 }
-#signal-alert.visible{display:block}
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-.alert-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.alert-badge{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;animation:pulse 1.5s infinite;
+.signal-box.active-vermelho {
+  background: rgba(239,68,68,.07);
+  border-color: #ef4444;
+  box-shadow: 0 0 36px rgba(239,68,68,.12);
 }
-.alert-title{font-size:.9rem;font-weight:700;color:var(--accent2)}
-.signal-pills{display:flex;flex-wrap:wrap;gap:8px}
-.signal-pill{
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:10px;padding:8px 14px;font-size:.8rem;display:flex;align-items:center;gap:8px;
+.signal-box.active-preto {
+  background: rgba(71,85,105,.12);
+  border-color: #475569;
+  box-shadow: 0 0 24px rgba(71,85,105,.15);
 }
-.signal-pill.vermelho{border-color:var(--red);box-shadow:0 0 12px rgba(239,68,68,.2)}
-.signal-pill.preto{border-color:#475569}
-.signal-pill.branco{border-color:#94a3b8}
+.signal-box.active-branco {
+  background: rgba(148,163,184,.07);
+  border-color: #94a3b8;
+  box-shadow: 0 0 24px rgba(148,163,184,.1);
+}
+.signal-box.idle { background: var(--bg2); border-color: var(--border); }
 
-/* ── TABLE ── */
-.table-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:16px;overflow:hidden;margin-bottom:20px;
+.signal-left { display: flex; flex-direction: column; gap: 5px; }
+.signal-label { font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.signal-color { font-size: 2.2rem; font-weight: 900; letter-spacing: -.02em; }
+.signal-color.vermelho { color: #f87171; }
+.signal-color.preto    { color: #94a3b8; }
+.signal-color.branco   { color: #e2e8f0; }
+.signal-color.idle     { color: #2a2a3a; }
+.signal-seq {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 2px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.table-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;
+
+.signal-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.conf-big { font-size: 2.6rem; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+.conf-big.high { color: var(--green); }
+.conf-big.mid  { color: var(--yellow); }
+.conf-big.low  { color: var(--red); }
+.conf-big.idle { color: #2a2a3a; }
+.conf-label { font-size: .62rem; color: var(--muted); }
+.occ-badge {
+  font-size: .72rem;
+  color: var(--muted2);
+  background: var(--bg4);
+  padding: 2px 9px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
 }
-.table-title{font-size:.9rem;font-weight:700}
-.table-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.search-wrap{position:relative}
-.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none}
-.search-input{
-  background:var(--bg3);border:1px solid var(--border);
-  color:var(--text);padding:7px 12px 7px 32px;
-  border-radius:9px;font-size:.8rem;outline:none;width:200px;transition:border-color .2s;
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
 }
-.search-input:focus{border-color:var(--accent)}
-select.filter-sel{
-  background:var(--bg3);border:1px solid var(--border);
-  color:var(--text);padding:7px 10px;border-radius:9px;font-size:.78rem;outline:none;cursor:pointer;
+.stat-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color .2s, transform .2s;
 }
-select.filter-sel:focus{border-color:var(--accent)}
-.conf-range-wrap{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)}
-.conf-range-wrap input{width:90px;accent-color:var(--accent)}
-#conf-val{color:var(--accent2);font-weight:700}
+.stat-box:hover { border-color: var(--accent); transform: translateY(-2px); }
+.stat-box-label { font-size: .58rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.stat-box-value { font-size: 1.65rem; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+.stat-box-value.green  { color: var(--green); }
+.stat-box-value.red    { color: var(--red); }
+.stat-box-value.purple { color: var(--accent2); }
+.stat-box-value.yellow { color: var(--yellow); }
+.stat-box-sub { font-size: .62rem; color: var(--muted); }
 
-table{width:100%;border-collapse:collapse}
-thead tr{background:var(--bg3);border-bottom:1px solid var(--border)}
-th{
-  padding:11px 14px;text-align:left;
-  font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--muted);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;
+/* History */
+.history-section { width: 100%; }
+.history-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.hpill {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  transition: transform .1s;
+  cursor: default;
 }
-th:hover{color:var(--text)}
-tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
-tbody tr:hover{background:var(--bg3)}
-tbody tr:last-child{border-bottom:none}
-td{padding:12px 14px;font-size:.82rem;vertical-align:middle}
+.hpill:hover { transform: scale(1.4); }
+.hpill.win  { background: var(--green); }
+.hpill.loss { background: var(--red); }
 
-.seq-chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
-.chip{padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.chip.preto{background:#1a2030;color:#94a3b8;border:1px solid #2d3748}
-.chip.vermelho{background:#2d1515;color:#f87171;border:1px solid #7f1d1d}
-.chip.branco{background:#1e2030;color:#e2e8f0;border:1px solid #334155}
-.arrow{color:var(--muted);font-size:.6rem;margin:0 1px}
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.actions .btn { flex: 1; min-width: 100px; text-align: center; padding: 11px 16px; }
 
-.predict-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;font-size:.75rem;font-weight:700}
-.predict-badge.preto{background:#1a2030;color:#94a3b8}
-.predict-badge.vermelho{background:#2d1515;color:#f87171}
-.predict-badge.branco{background:#1e2030;color:#e2e8f0}
+/* Status bar */
+.status-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: .68rem;
+  color: var(--muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  display: inline-block;
+  margin-right: 5px;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-.conf-cell{min-width:110px}
-.conf-num{font-size:.82rem;font-weight:700}
-.conf-bar-bg{height:5px;background:var(--bg4);border-radius:3px;margin-top:4px;overflow:hidden}
-.conf-bar{height:100%;border-radius:3px;transition:width .5s ease}
-.conf-bar.high{background:linear-gradient(90deg,var(--green),#4ade80)}
-.conf-bar.med{background:linear-gradient(90deg,var(--yellow),#fbbf24)}
-.conf-bar.low{background:linear-gradient(90deg,var(--red),#f87171)}
+/* ── STRATEGIES PAGE ── */
+#page-strategies { padding: 20px; }
+.table-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.table-title { font-size: .9rem; font-weight: 700; }
+.table-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.search-wrap { position: relative; }
+.search-wrap::before { content:'🔍'; position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; pointer-events:none; }
+.search-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 12px 7px 32px;
+  border-radius: 9px;
+  font-size: .78rem;
+  outline: none;
+  width: 200px;
+  font-family: inherit;
+  transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+select.filter-sel {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 9px;
+  font-size: .75rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+select.filter-sel:focus { border-color: var(--accent); }
+.conf-range-wrap { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--muted); }
+.conf-range-wrap input { width: 85px; accent-color: var(--accent); }
+#conf-val { color: var(--accent2); font-weight: 700; }
 
-.dist-mini{display:flex;gap:3px;align-items:flex-end;height:26px}
-.dm-col{display:flex;flex-direction:column;align-items:center;gap:1px}
-.dm-bar{width:16px;border-radius:2px 2px 0 0;min-height:2px}
-.dm-bar.preto{background:#475569}
-.dm-bar.vermelho{background:#ef4444}
-.dm-bar.branco{background:#94a3b8}
-.dm-lbl{font-size:.5rem;color:var(--muted)}
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--bg3); border-bottom: 1px solid var(--border); }
+th {
+  padding: 11px 14px;
+  text-align: left;
+  font-size: .63rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted2);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+th:hover { color: var(--text); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+tbody tr:hover { background: var(--bg3); }
+tbody tr:last-child { border-bottom: none; }
+td { padding: 12px 14px; font-size: .8rem; vertical-align: middle; }
 
-.occ{background:var(--bg3);border:1px solid var(--border);padding:3px 9px;border-radius:6px;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted2)}
-.empty{text-align:center;padding:50px 20px;color:var(--muted)}
-.empty-icon{font-size:2.5rem;margin-bottom:12px}
+.seq-chips { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; }
+.chip {
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: .65rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.chip.preto    { background: #1a2030; color: #94a3b8; border: 1px solid #2d3748; }
+.chip.vermelho { background: #2d1515; color: #f87171; border: 1px solid #7f1d1d; }
+.chip.branco   { background: #1e2030; color: #e2e8f0; border: 1px solid #334155; }
+.arrow { color: var(--muted); font-size: .58rem; margin: 0 1px; }
+
+.predict-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 8px;
+  font-size: .73rem;
+  font-weight: 700;
+}
+.predict-badge.preto    { background: #1a2030; color: #94a3b8; }
+.predict-badge.vermelho { background: #2d1515; color: #f87171; }
+.predict-badge.branco   { background: #1e2030; color: #e2e8f0; }
+
+.conf-cell { min-width: 110px; }
+.conf-num  { font-size: .8rem; font-weight: 700; }
+.conf-bar-bg { height: 5px; background: var(--bg4); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+.conf-bar { height: 100%; border-radius: 3px; transition: width .5s; }
+.conf-bar.high { background: linear-gradient(90deg, var(--green), #4ade80); }
+.conf-bar.med  { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
+.conf-bar.low  { background: linear-gradient(90deg, var(--red), #f87171); }
+
+.dist-mini { display: flex; gap: 3px; align-items: flex-end; height: 24px; }
+.dm-col { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.dm-bar { width: 14px; border-radius: 2px 2px 0 0; min-height: 2px; }
+.dm-bar.preto    { background: #475569; }
+.dm-bar.vermelho { background: #ef4444; }
+.dm-bar.branco   { background: #94a3b8; }
+.dm-lbl { font-size: .48rem; color: var(--muted); }
+.occ {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: .7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted2);
+}
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
 
 /* ── SIGNALS PAGE ── */
-.signal-card{
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:14px;padding:16px 20px;
-  margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
-  gap:1rem;flex-wrap:wrap;transition:border-color .2s,box-shadow .2s;
+#page-signals { padding: 20px; }
+.signal-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  transition: border-color .2s, box-shadow .2s;
 }
-.signal-card:hover{border-color:var(--accent);box-shadow:var(--card-glow)}
-.signal-card.vermelho{border-left:4px solid var(--red)}
-.signal-card.preto{border-left:4px solid #475569}
-.signal-card.branco{border-left:4px solid #94a3b8}
-.sc-seq{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600}
-.sc-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.sc-time{font-size:.7rem;color:var(--muted)}
+.signal-card:hover { border-color: var(--accent); box-shadow: 0 0 24px rgba(124,58,237,.08); }
+.signal-card.vermelho { border-left: 4px solid var(--red); }
+.signal-card.preto    { border-left: 4px solid #475569; }
+.signal-card.branco   { border-left: 4px solid #94a3b8; }
+.sc-seq { font-family: 'JetBrains Mono', monospace; font-size: .83rem; font-weight: 600; }
+.sc-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sc-time { font-size: .68rem; color: var(--muted); }
 
-/* ── HEATMAP ── */
-.heatmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:12px}
-.hm-cell{
-  aspect-ratio:1;border-radius:5px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace;
-  cursor:pointer;transition:transform .15s;border:1px solid transparent;
+/* ── HEATMAP PAGE ── */
+#page-heatmap { padding: 20px; }
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
 }
-.hm-cell:hover{transform:scale(1.15);border-color:var(--accent)}
-.hm-header{display:flex;gap:4px;margin-bottom:4px}
-.hm-label{font-size:.6rem;color:var(--muted);text-align:center;flex:1}
+.chart-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: border-color .2s;
+}
+.chart-card:hover { border-color: rgba(124,58,237,.4); }
+.chart-title { font-size: .85rem; font-weight: 700; margin-bottom: 4px; }
+.chart-sub   { font-size: .68rem; color: var(--muted); margin-bottom: 14px; }
+.chart-wrap  { position: relative; width: 100%; }
+
+.hm-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .62rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: transform .15s;
+  border: 1px solid transparent;
+}
+.hm-cell:hover { transform: scale(1.1); border-color: var(--accent); }
+.hm-header { display: flex; gap: 4px; margin-bottom: 4px; }
+.hm-label  { font-size: .58rem; color: var(--muted); text-align: center; flex: 1; }
 
 /* ── TOAST ── */
-#toast{
-  position:fixed;bottom:28px;right:28px;z-index:999;
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:12px;padding:12px 20px;
-  font-size:.85rem;font-weight:600;
-  opacity:0;transform:translateY(16px);
-  transition:all .3s ease;pointer-events:none;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-size: .82rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all .3s;
+  pointer-events: none;
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
-#toast.show{opacity:1;transform:translateY(0)}
-#toast.ok{border-color:var(--green);color:var(--green)}
-#toast.err{border-color:var(--red);color:var(--red)}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok  { border-color: var(--green); color: var(--green); }
+#toast.err { border-color: var(--red);   color: var(--red); }
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:none}
-  .main{margin-left:0}
-  .charts-row{grid-template-columns:1fr}
-  .charts-row-2{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .live-bottom{grid-template-columns:1fr 1fr}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .actions .btn { min-width: 80px; }
+  .heat-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🎯</div>
-    <div class="logo-title">DoubleSequenceIA</div>
-    <div class="logo-sub">Pattern Recognition Engine</div>
-  </div>
-  <div class="nav">
-    <div class="nav-item active" id="nav-overview" onclick="navigate('overview',this)">
-      <span class="nav-icon">📊</span> Visão Geral
-    </div>
-    <div class="nav-item" id="nav-live" onclick="navigate('live',this)">
-      <span class="nav-icon">🔴</span> Ao Vivo
-      <span class="nav-badge" id="nb-live" style="background:#ef4444">LIVE</span>
-    </div>
-    <div class="nav-item" id="nav-strategies" onclick="navigate('strategies',this)">
-      <span class="nav-icon">🧠</span> Estratégias
-      <span class="nav-badge" id="nb-strats">0</span>
-    </div>
-    <div class="nav-item" id="nav-signals" onclick="navigate('signals',this)">
-      <span class="nav-icon">🚨</span> Sinais
-      <span class="nav-badge" id="nb-signals">0</span>
-    </div>
-    <div class="nav-item" id="nav-heatmap" onclick="navigate('heatmap',this)">
-      <span class="nav-icon">🔥</span> Heatmap
-    </div>
-  </div>
-  <div class="sidebar-bottom">
-    <div class="status-row">
-      <div class="dot" id="status-dot"></div>
-      <span id="sidebar-status">Carregando...</span>
-    </div>
-  </div>
-</nav>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab-live"       onclick="switchTab('live',this)">🔴 Ao Vivo <span class="tab-badge live">LIVE</span></div>
+  <div class="tab"        id="tab-strategies" onclick="switchTab('strategies',this)">🧠 Estratégias <span class="tab-badge" id="nb-strats">0</span></div>
+  <div class="tab"        id="tab-signals"    onclick="switchTab('signals',this)">🚨 Sinais <span class="tab-badge" id="nb-signals">0</span></div>
+  <div class="tab"        id="tab-heatmap"    onclick="switchTab('heatmap',this)">🔥 Heatmap</div>
+</div>
 
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="btn btn-ghost" onclick="toggleSidebar()" style="padding:7px 10px" id="sidebar-toggle">☰</button>
-      <div>
-        <div class="page-title" id="topbar-title">Visão Geral</div>
-        <div class="page-sub" id="topbar-sub">Dashboard analítico em tempo real</div>
-      </div>
+<!-- ═══════ PAGE: AO VIVO ═══════ -->
+<div class="page active" id="page-live">
+  <div class="header">
+    <div class="header-left">
+      <h1>🎯 DoubleSequenceIA</h1>
+      <p>Monitor ao Vivo • Blaze Double</p>
     </div>
-    <div class="topbar-right">
-      <span id="last-update">—</span>
-      <button class="btn btn-ghost" onclick="loadAll()" id="btn-refresh">↻ Atualizar</button>
-      <button class="btn btn-primary" onclick="startLivePolling()" id="btn-live">⚡ Live</button>
+    <div class="header-right">
+      <span id="last-update" style="font-size:.68rem;color:var(--muted)">—</span>
+      <button class="btn" onclick="poll()">↻</button>
+      <button class="btn btn-primary" onclick="togglePause()" id="btn-pause">⏸ Pausar</button>
     </div>
   </div>
 
-  <!-- ═══════ PAGE: OVERVIEW ═══════ -->
-  <div class="page active" id="page-overview">
-    <div style="padding:0">
-
-      <!-- Signal Alert -->
-      <div id="signal-alert">
-        <div class="alert-header">
-          <span class="alert-badge">🚨 AO VIVO</span>
-          <span class="alert-title">Sinais Recentes Detectados</span>
-        </div>
-        <div class="signal-pills" id="alert-pills"></div>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">🧠</div>
-          <div class="stat-label">Total Estratégias</div>
-          <div class="stat-value" id="s-total">—</div>
-          <div class="stat-sub">no catálogo</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-icon">💚</div>
-          <div class="stat-label">Alta Confiança</div>
-          <div class="stat-value" id="s-high" style="color:var(--green)">—</div>
-          <div class="stat-sub">≥ 90%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-label">Conf. Média</div>
-          <div class="stat-value" id="s-avg" style="color:var(--accent2)">—</div>
-          <div class="stat-sub">do catálogo</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-icon">🚨</div>
-          <div class="stat-label">Sinais Hoje</div>
-          <div class="stat-value" id="s-today" style="color:var(--red)">—</div>
-          <div class="stat-sub">detectados</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-icon">4️⃣</div>
-          <div class="stat-label">Seq. 4 Cores</div>
-          <div class="stat-value" id="s-4" style="color:var(--blue)">—</div>
-        </div>
-        <div class="stat-card yellow">
-          <div class="stat-icon">5️⃣</div>
-          <div class="stat-label">Seq. 5 Cores</div>
-          <div class="stat-value" id="s-5" style="color:var(--yellow)">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">6️⃣</div>
-          <div class="stat-label">Seq. 6 Cores</div>
-          <div class="stat-value" id="s-6">—</div>
-        </div>
-      </div>
-
-      <!-- Charts row 1 -->
-      <div class="charts-row">
-        <div class="chart-card">
-          <div class="chart-title">Distribuição por Confiança</div>
-          <div class="chart-sub">Quantidade de estratégias por faixa</div>
-          <div class="chart-wrap" style="height:180px"><canvas id="chart-conf-dist"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Cor Prevista</div>
-          <div class="chart-sub">Estratégias por cor alvo</div>
-          <div class="chart-wrap" style="height:180px"><canvas id="chart-color-pie"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Tamanho de Sequência</div>
-          <div class="chart-sub">Estratégias por tamanho</div>
-          <div class="chart-wrap" style="height:180px"><canvas id="chart-size-bar"></canvas></div>
-        </div>
-      </div>
-
-      <!-- Charts row 2 -->
-      <div class="charts-row-2">
-        <div class="chart-card">
-          <div class="chart-title">Top 10 — Confiança Máxima</div>
-          <div class="chart-sub">Estratégias com maior % de acerto histórico</div>
-          <div class="chart-wrap" style="height:220px"><canvas id="chart-top10"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Sinais por Hora</div>
-          <div class="chart-sub">Distribuição temporal de hoje</div>
-          <div class="chart-wrap" style="height:220px"><canvas id="chart-signals-hour"></canvas></div>
-        </div>
-      </div>
-
+  <!-- Rodadas -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:16px 20px 0">
+    <div class="section-label">Últimas rodadas (← mais antigo · atual →)</div>
+    <div class="rounds-row" id="rounds-row">
+      <span style="color:var(--muted);font-size:.8rem">Aguardando dados da API...</span>
     </div>
   </div>
 
-  <!-- ═══════ PAGE: AO VIVO ═══════ -->
-  <div class="page" id="page-live">
-
-    <!-- Live panel -->
-    <div class="live-panel">
-      <div class="live-panel-title">
-        <span class="live-badge">🔴 AO VIVO</span>
-        <h2>Resultados em Tempo Real</h2>
-        <span id="live-total" style="font-size:.72rem;color:var(--muted);margin-left:auto"></span>
+  <!-- Signal box -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:0 20px">
+    <div class="signal-box idle" id="signal-box">
+      <div class="signal-left">
+        <div class="signal-label">🎯 Apostar em</div>
+        <div class="signal-color idle" id="signal-color">— Sem sinal</div>
+        <div class="signal-seq" id="signal-seq"></div>
       </div>
-
-      <!-- Rounds strip -->
-      <div style="margin-bottom:8px">
-        <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Últimas rodadas (mais recente →)</span>
-      </div>
-      <div class="rounds-strip" id="rounds-strip">
-        <span style="color:var(--muted);font-size:.8rem">Aguardando dados...</span>
-      </div>
-
-      <!-- Bottom cards -->
-      <div class="live-bottom" id="live-bottom-grid">
-        <!-- Aposta recomendada -->
-        <div class="bet-card none" id="bet-card">
-          <div class="lc-label">🎯 Apostar em</div>
-          <div class="bet-color-display none" id="bet-display">— Aguardando</div>
-          <div class="bet-conf" id="bet-conf">Sem sinal ativo</div>
-          <div id="bet-seq" style="font-size:.68rem;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace"></div>
-        </div>
-
-        <!-- Win Rate -->
-        <div class="live-card">
-          <div class="lc-label">📊 Win Rate</div>
-          <div class="lc-value winrate-val" id="live-winrate">—</div>
-          <div class="lc-sub" id="live-winrate-sub">0 apostas</div>
-          <div class="hist-pills" id="hist-pills"></div>
-        </div>
-
-        <!-- Win Streak -->
-        <div class="live-card">
-          <div class="lc-label">🔥 Sequência Atual</div>
-          <div class="lc-value" id="live-streak">—</div>
-          <div class="lc-sub" id="live-streak-sub">—</div>
-        </div>
-
-        <!-- W/L Contadores + Reset -->
-        <div class="live-card">
-          <div class="lc-label">🏆 Resultados</div>
-          <div style="display:flex;gap:14px;align-items:baseline;margin-bottom:6px">
-            <span style="font-size:1.4rem;font-weight:900;color:var(--green)" id="live-wins">0</span>
-            <span style="color:var(--muted);font-size:.75rem">W</span>
-            <span style="font-size:1.4rem;font-weight:900;color:var(--red)" id="live-losses">0</span>
-            <span style="color:var(--muted);font-size:.75rem">L</span>
-          </div>
-          <button class="btn btn-danger" id="btn-reset-stats" onclick="resetStats()" style="font-size:.75rem;padding:5px 12px;width:100%">
-            🗑️ Zerar W/L
-          </button>
-        </div>
-      </div>
-
-      <!-- Manual W/L buttons -->
-      <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
-        <span style="font-size:.75rem;color:var(--muted)">Registrar resultado manual:</span>
-        <button class="btn" style="background:var(--green-soft);color:var(--green);border-color:var(--green);font-size:.78rem" onclick="logResult('win')" id="btn-win">✅ Win</button>
-        <button class="btn" style="background:var(--red-soft);color:var(--red);border-color:var(--red);font-size:.78rem" onclick="logResult('loss')" id="btn-loss">❌ Loss</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ═══════ PAGE: STRATEGIES ═══════ -->
-  <div class="page" id="page-strategies">
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">🧠 Catálogo de Estratégias</div>
-        <div class="table-controls">
-          <div class="search-wrap">
-            <input class="search-input" id="strat-search" type="text" placeholder="Buscar sequência...">
-          </div>
-          <select class="filter-sel" id="strat-size">
-            <option value="all">Todos tamanhos</option>
-            <option value="4">4 cores</option>
-            <option value="5">5 cores</option>
-            <option value="6">6 cores</option>
-          </select>
-          <select class="filter-sel" id="strat-color">
-            <option value="all">Todas cores</option>
-            <option value="preto">⚫ Preto</option>
-            <option value="vermelho">🔴 Vermelho</option>
-            <option value="branco">⚪ Branco</option>
-          </select>
-          <div class="conf-range-wrap">
-            Conf ≥ <span id="conf-val">70%</span>
-            <input type="range" id="strat-conf" min="70" max="100" value="70">
-          </div>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Sequência</th>
-            <th>Apostar em</th>
-            <th onclick="sortStrats('confidence')">Confiança ↕</th>
-            <th>Distribuição</th>
-            <th onclick="sortStrats('occurrences')">Ocorrências ↕</th>
-            <th>Tam.</th>
-          </tr>
-        </thead>
-        <tbody id="strat-tbody"></tbody>
-      </table>
-      <div id="strat-empty" class="empty" style="display:none">
-        <div class="empty-icon">🔍</div>
-        <p>Nenhuma estratégia com esses filtros.</p>
+      <div class="signal-right">
+        <div class="conf-big idle" id="conf-big">—%</div>
+        <div class="conf-label">confiança</div>
+        <div class="occ-badge" id="occ-badge">— ocorrências</div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════ PAGE: SIGNALS ═══════ -->
-  <div class="page" id="page-signals">
-    <div class="section-header">
-      <div class="section-title">🚨 Histórico de Sinais</div>
-      <div class="section-sub">Últimas sequências detectadas em tempo real</div>
-    </div>
-    <div id="signals-list"></div>
-    <div id="signals-empty" class="empty" style="display:none">
-      <div class="empty-icon">📭</div>
-      <p>Nenhum sinal registrado ainda.</p>
+  <!-- Stats grid -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:0 20px">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-box-label">📊 Win Rate</div>
+        <div class="stat-box-value purple" id="stat-winrate">—</div>
+        <div class="stat-box-sub" id="stat-total">0 apostas</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">✅ Wins</div>
+        <div class="stat-box-value green" id="stat-wins">0</div>
+        <div class="stat-box-sub">acertos</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">❌ Losses</div>
+        <div class="stat-box-value red" id="stat-losses">0</div>
+        <div class="stat-box-sub">erros</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">🔥 Streak</div>
+        <div class="stat-box-value yellow" id="stat-streak">—</div>
+        <div class="stat-box-sub" id="stat-streak-type">—</div>
+      </div>
     </div>
   </div>
 
-  <!-- ═══════ PAGE: HEATMAP ═══════ -->
-  <div class="page" id="page-heatmap">
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="chart-card">
-        <div class="chart-title">🔥 Heatmap — Sequências × Cor Alvo</div>
-        <div class="chart-sub">Calor = confiança média das estratégias</div>
-        <div style="margin-top:8px">
-          <div class="hm-header">
-            <div class="hm-label">PRETO</div>
-            <div class="hm-label">VERM.</div>
-            <div class="hm-label">BRANCO</div>
-          </div>
-          <div id="heatmap-grid" class="heatmap-grid"></div>
+  <!-- History pills -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:0 20px">
+    <div class="history-section">
+      <div class="section-label">Histórico recente</div>
+      <div class="history-pills" id="history-pills"></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:0 20px">
+    <div class="actions">
+      <button class="btn btn-win"   onclick="logResult('win')" id="btn-win">✅ Win</button>
+      <button class="btn btn-loss"  onclick="logResult('loss')" id="btn-loss">❌ Loss</button>
+      <button class="btn btn-reset" onclick="resetStats()" id="btn-reset">🗑️ Zerar Stats</button>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div style="width:100%;max-width:760px;margin:0 auto;padding:0 20px 20px">
+    <div class="status-bar">
+      <span>
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Conectando à API...</span>
+      </span>
+      <span id="status-right">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE: STRATEGIES ═══════ -->
+<div class="page" id="page-strategies">
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">🧠 Catálogo de Estratégias</div>
+      <div class="table-controls">
+        <div class="search-wrap">
+          <input class="search-input" id="strat-search" type="text" placeholder="Buscar sequência...">
+        </div>
+        <select class="filter-sel" id="strat-size">
+          <option value="all">Todos tamanhos</option>
+          <option value="4">4 cores</option>
+          <option value="5">5 cores</option>
+          <option value="6">6 cores</option>
+        </select>
+        <select class="filter-sel" id="strat-color">
+          <option value="all">Todas cores</option>
+          <option value="preto">⚫ Preto</option>
+          <option value="vermelho">🔴 Vermelho</option>
+          <option value="branco">⚪ Branco</option>
+        </select>
+        <div class="conf-range-wrap">
+          Conf ≥ <span id="conf-val">70%</span>
+          <input type="range" id="strat-conf" min="70" max="100" value="70">
         </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">📊 Ocorrências por Padrão</div>
-        <div class="chart-sub">Top 12 sequências mais comuns</div>
-        <div class="chart-wrap" style="height:260px"><canvas id="chart-occ-top"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">🎯 Confiança vs Ocorrências</div>
-        <div class="chart-sub">Scatter — volume vs qualidade</div>
-        <div class="chart-wrap" style="height:260px"><canvas id="chart-scatter"></canvas></div>
-      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Sequência</th>
+          <th>Apostar em</th>
+          <th onclick="sortStrats('confidence')">Confiança ↕</th>
+          <th>Distribuição</th>
+          <th onclick="sortStrats('occurrences')">Ocorrências ↕</th>
+          <th>Tam.</th>
+        </tr>
+      </thead>
+      <tbody id="strat-tbody"></tbody>
+    </table>
+    <div id="strat-empty" class="empty" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <p>Nenhuma estratégia com esses filtros.</p>
     </div>
   </div>
+</div>
 
-</div><!-- /main -->
+<!-- ═══════ PAGE: SIGNALS ═══════ -->
+<div class="page" id="page-signals">
+  <div style="margin-bottom:16px">
+    <div class="table-title" style="font-size:1rem;margin-bottom:4px">🚨 Histórico de Sinais</div>
+    <div style="font-size:.72rem;color:var(--muted)">Últimas sequências detectadas em tempo real</div>
+  </div>
+  <div id="signals-list"></div>
+  <div id="signals-empty" class="empty" style="display:none">
+    <div class="empty-icon">📭</div>
+    <p>Nenhum sinal registrado ainda.</p>
+  </div>
+</div>
 
-<!-- Toast notification -->
+<!-- ═══════ PAGE: HEATMAP ═══════ -->
+<div class="page" id="page-heatmap">
+  <div class="heat-grid">
+    <div class="chart-card">
+      <div class="chart-title">🔥 Heatmap — Sequências × Cor</div>
+      <div class="chart-sub">Calor = confiança média das estratégias</div>
+      <div class="hm-header">
+        <div class="hm-label">PRETO</div>
+        <div class="hm-label">VERM.</div>
+        <div class="hm-label">BRANCO</div>
+      </div>
+      <div id="heatmap-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">📊 Top Ocorrências</div>
+      <div class="chart-sub">12 sequências mais comuns</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chart-occ-top"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">🎯 Confiança vs Ocorrências</div>
+      <div class="chart-sub">Scatter — volume vs qualidade</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chart-scatter"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   GLOBAL STATE
-═══════════════════════════════════════════════════ */
-let strats  = [];
-let signals = [];
-let liveData = null;
-let sortField = 'confidence';
-let charts = {};
-let liveInterval = null;
-let apiBase = 'http://localhost:8765';
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const API = 'http://localhost:8765';
+let paused     = false;
+let pollTimer  = null;
+let strats     = [];
+let signals    = [];
+let sortField  = 'confidence';
+let charts     = {};
 
-/* ═══════════════════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════════════════ */
-const pageMap = {
-  overview:   {title:'Visão Geral',   sub:'Dashboard analítico em tempo real'},
-  live:       {title:'Ao Vivo',       sub:'Rodadas e apostas em tempo real'},
-  strategies: {title:'Estratégias',   sub:'Catálogo completo de padrões'},
-  signals:    {title:'Sinais',        sub:'Histórico de detecções'},
-  heatmap:    {title:'Heatmap',       sub:'Mapa de calor de padrões'},
-};
-function navigate(name, el) {
+const EMOJI = { preto:'⚫', vermelho:'🔴', branco:'⚪' };
+const FONT  = "'Inter', sans-serif";
+
+/* ══════════════════════════════════════════
+   TABS
+══════════════════════════════════════════ */
+function switchTab(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
-  document.getElementById('topbar-title').textContent = pageMap[name].title;
-  document.getElementById('topbar-sub').textContent   = pageMap[name].sub;
   if (name === 'heatmap') renderHeatmapPage();
 }
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-}
 
-/* ═══════════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════════ */
-function showToast(msg, type='ok') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = ''; }, 3000);
-}
-
-/* ═══════════════════════════════════════════════════
-   DATA LOADING
-═══════════════════════════════════════════════════ */
-async function loadStrategies() {
+/* ══════════════════════════════════════════
+   POLLING AO VIVO
+══════════════════════════════════════════ */
+async function poll() {
+  if (paused) return;
   try {
-    const r = await fetch('/data/strategies.json');
-    if (!r.ok) throw new Error('not found');
-    strats = await r.json();
-  } catch {
-    strats = [];
-  }
-}
-
-async function loadSignals() {
-  try {
-    const r = await fetch('/data/signals_log.json');
-    if (!r.ok) throw new Error('not found');
-    signals = await r.json();
-  } catch {
-    signals = [];
-  }
-}
-
-async function loadLiveData() {
-  try {
-    const r = await fetch(apiBase + '/api/live', {signal: AbortSignal.timeout(4000)});
-    if (!r.ok) throw new Error('api error');
-    liveData = await r.json();
-    updateLivePanel();
+    const r = await fetch(API + '/api/live', { signal: AbortSignal.timeout(4000) });
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    renderLive(d);
     setOnline(true);
-    return true;
   } catch {
     setOnline(false);
-    return false;
   }
 }
 
-function setOnline(online) {
-  const dot = document.getElementById('status-dot');
-  if (online) {
-    dot.classList.remove('offline');
-    document.getElementById('sidebar-status').textContent =
-      strats.length + ' estratégias • API online';
+function startPoll() {
+  poll();
+  pollTimer = setInterval(poll, 5000);
+}
+
+function togglePause() {
+  paused = !paused;
+  const btn = document.getElementById('btn-pause');
+  if (paused) {
+    btn.textContent = '▶ Continuar';
+    btn.style.background = 'rgba(245,158,11,.1)';
+    btn.style.borderColor = '#f59e0b';
+    btn.style.color = '#f59e0b';
   } else {
-    dot.classList.add('offline');
-    document.getElementById('sidebar-status').textContent = 'API offline — modo estático';
+    btn.textContent = '⏸ Pausar';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.className = 'btn btn-primary';
+    poll();
   }
+  showToast(paused ? '⏸ Pausado' : '▶ Retomado', 'ok');
 }
 
-async function loadAll() {
-  await Promise.all([loadStrategies(), loadSignals(), loadLiveData()]);
-  updateAll();
-  document.getElementById('last-update').textContent =
-    'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
+/* ══════════════════════════════════════════
+   RENDER AO VIVO
+══════════════════════════════════════════ */
+function renderLive(d) {
+  renderRounds(d.recent, d.current);
+  renderSignal(d.next_bet);
+  renderStats(d.stats);
+  const ts = d.timestamp ? new Date(d.timestamp).toLocaleTimeString('pt-BR') : '—';
+  const tot = (d.total_rounds || 0).toLocaleString('pt-BR');
+  document.getElementById('status-right').textContent = `${tot} rodadas • ${ts}`;
+  document.getElementById('last-update').textContent = 'Atualizado ' + ts;
 }
 
-function updateAll() {
-  updateStats();
-  renderSignalAlert();
-  renderCharts();
-  renderStrategies();
-  renderSignals();
-  document.getElementById('nb-strats').textContent  = strats.length;
-  document.getElementById('nb-signals').textContent = signals.length;
-}
-
-/* ═══════════════════════════════════════════════════
-   LIVE POLLING
-═══════════════════════════════════════════════════ */
-function startLivePolling() {
-  if (liveInterval) return;
-  liveInterval = setInterval(async () => {
-    await loadLiveData();
-    // Reload signals too for fresh data
-    await loadSignals();
-    renderSignals();
-    document.getElementById('nb-signals').textContent = signals.length;
-    document.getElementById('last-update').textContent =
-      'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
-  }, 5000);
-  document.getElementById('btn-live').textContent = '⏸ Pausar';
-  document.getElementById('btn-live').onclick = stopLivePolling;
-  showToast('✅ Polling ao vivo ativado (5s)', 'ok');
-}
-
-function stopLivePolling() {
-  clearInterval(liveInterval);
-  liveInterval = null;
-  document.getElementById('btn-live').textContent = '⚡ Live';
-  document.getElementById('btn-live').onclick = startLivePolling;
-  showToast('⏸ Polling pausado', 'ok');
-}
-
-/* ═══════════════════════════════════════════════════
-   LIVE PANEL
-═══════════════════════════════════════════════════ */
-const EMOJI = {preto:'⚫', vermelho:'🔴', branco:'⚪'};
-const CNAME = {preto:'Preto', vermelho:'Vermelho', branco:'Branco'};
-
-function updateLivePanel() {
-  if (!liveData) return;
-  const { recent, current, next_bet, stats, total_rounds } = liveData;
-
-  // Total rounds
-  const totalEl = document.getElementById('live-total');
-  if (totalEl && total_rounds != null)
-    totalEl.textContent = `${total_rounds.toLocaleString('pt-BR')} rodadas no DB`;
-
-  // Rounds strip
-  renderRoundsStrip(recent, current);
-
-  // Bet card
-  renderBetCard(next_bet);
-
-  // Stats
-  if (stats) renderLiveStats(stats);
-}
-
-function renderRoundsStrip(recent, current) {
-  const strip = document.getElementById('rounds-strip');
-  if (!recent || !recent.length) {
-    strip.innerHTML = '<span style="color:var(--muted);font-size:.8rem">Sem dados disponíveis. Inicie o servidor API.</span>';
+function renderRounds(recent, current) {
+  const row = document.getElementById('rounds-row');
+  if (!recent?.length) {
+    row.innerHTML = '<span style="color:var(--muted);font-size:.8rem">Sem dados — inicie o servidor API (porta 8765)</span>';
     return;
   }
-  const currentId = current ? current.id : null;
-  strip.innerHTML = recent.map(r => {
-    const isCurrent = r.id === currentId;
+  const curId = current?.id;
+  row.innerHTML = recent.map(r => {
+    const isLatest = r.id === curId;
     const roll = r.roll != null ? r.roll : '?';
-    const cls  = `round-ball ${r.color}${isCurrent ? ' current' : ''}`;
-    return `<div class="${cls}" title="${CNAME[r.color] || r.color} — roll ${roll}${isCurrent ? ' (ATUAL)' : ''}">
-      <span class="rb-num">${roll}</span>
-      <span class="rb-label">${(r.color||'').substring(0,3).toUpperCase()}</span>
-    </div>`;
-  }).join('') + (recent.length ? '<span class="rounds-strip-label">← mais antigo</span>' : '');
-}
-
-function renderBetCard(bet) {
-  const card    = document.getElementById('bet-card');
-  const display = document.getElementById('bet-display');
-  const conf    = document.getElementById('bet-conf');
-  const seqEl   = document.getElementById('bet-seq');
-
-  if (!bet) {
-    card.className = 'bet-card none';
-    display.className = 'bet-color-display none';
-    display.textContent = '— Sem sinal';
-    conf.textContent = 'Nenhuma sequência ativa detectada';
-    seqEl.textContent = '';
-    return;
-  }
-  const c = bet.predict_color;
-  card.className = `bet-card ${c}`;
-  display.className = `bet-color-display ${c}`;
-  display.textContent = `${EMOJI[c]||'?'} ${(CNAME[c]||c).toUpperCase()}`;
-  conf.textContent = `${bet.confidence}% confiança • ${bet.occurrences}× histórico`;
-  seqEl.textContent = bet.sequence_str ? `Sequência: ${bet.sequence_str}` : '';
-}
-
-function renderLiveStats(stats) {
-  const { wins, losses, total, win_rate, win_streak, loss_streak, history } = stats;
-
-  // Win rate
-  const wrEl = document.getElementById('live-winrate');
-  const wrSub = document.getElementById('live-winrate-sub');
-  if (wrEl) {
-    wrEl.textContent = total > 0 ? win_rate + '%' : '—';
-    wrEl.className = 'lc-value winrate-val' + (win_rate >= 60 ? '' : win_rate >= 45 ? ' mid' : ' low');
-    if (wrSub) wrSub.textContent = total > 0 ? `${total} apostas registradas` : 'Sem apostas';
-  }
-
-  // Streak
-  const strEl  = document.getElementById('live-streak');
-  const strSub = document.getElementById('live-streak-sub');
-  if (strEl) {
-    if (win_streak > 0) {
-      strEl.innerHTML = `<span class="streak-win">🔥 ${win_streak}</span>`;
-      if (strSub) strSub.textContent = 'Win em sequência';
-    } else if (loss_streak > 0) {
-      strEl.innerHTML = `<span class="streak-loss">💔 ${loss_streak}</span>`;
-      if (strSub) strSub.textContent = 'Loss em sequência';
-    } else {
-      strEl.textContent = '—';
-      if (strSub) strSub.textContent = 'Sem apostas';
-    }
-  }
-
-  // Wins/losses counters
-  const wEl = document.getElementById('live-wins');
-  const lEl = document.getElementById('live-losses');
-  if (wEl) wEl.textContent = wins;
-  if (lEl) lEl.textContent = losses;
-
-  // History pills
-  const pillsEl = document.getElementById('hist-pills');
-  if (pillsEl && history) {
-    pillsEl.innerHTML = history.slice(-20).map(h =>
-      `<span class="hist-pill ${h.result}" title="${h.result.toUpperCase()} — ${new Date(h.timestamp).toLocaleTimeString('pt-BR')}"></span>`
-    ).join('');
-  }
-}
-
-/* ═══════════════════════════════════════════════════
-   WIN/LOSS ACTIONS
-═══════════════════════════════════════════════════ */
-async function logResult(result) {
-  try {
-    const r = await fetch(apiBase + '/api/log-result', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({result}),
-      signal: AbortSignal.timeout(4000)
-    });
-    const data = await r.json();
-    if (data.status === 'ok') {
-      showToast(result === 'win' ? '✅ Win registrado!' : '❌ Loss registrado!', 'ok');
-      await loadLiveData();
-    } else {
-      showToast('Erro: ' + (data.error || 'desconhecido'), 'err');
-    }
-  } catch (e) {
-    showToast('Erro de conexão com a API', 'err');
-  }
-}
-
-async function resetStats() {
-  if (!confirm('Zerar wins e losses? O banco de dados NÃO será afetado.')) return;
-  try {
-    const r = await fetch(apiBase + '/api/reset-stats', {
-      method: 'POST',
-      signal: AbortSignal.timeout(4000)
-    });
-    const data = await r.json();
-    if (data.status === 'ok') {
-      showToast('🗑️ Stats zeradas com sucesso!', 'ok');
-      await loadLiveData();
-    } else {
-      showToast('Erro ao zerar: ' + (data.error || 'desconhecido'), 'err');
-    }
-  } catch {
-    showToast('Erro de conexão com a API', 'err');
-  }
-}
-
-/* ═══════════════════════════════════════════════════
-   OVERVIEW STATS
-═══════════════════════════════════════════════════ */
-function updateStats() {
-  const s = strats;
-  document.getElementById('s-total').textContent = s.length;
-  document.getElementById('s-high').textContent  = s.filter(x=>x.confidence>=90).length;
-  document.getElementById('s-avg').textContent   =
-    s.length ? (s.reduce((a,b)=>a+b.confidence,0)/s.length).toFixed(1)+'%' : '—';
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('s-today').textContent =
-    signals.filter(x=>x.logged_at&&x.logged_at.startsWith(today)).length;
-  [4,5,6].forEach(n=>
-    document.getElementById('s-'+n).textContent = s.filter(x=>x.sequence_size===n).length
-  );
-}
-
-/* ═══════════════════════════════════════════════════
-   SIGNAL ALERT (overview)
-═══════════════════════════════════════════════════ */
-function renderSignalAlert() {
-  const recent = signals.slice(0,6);
-  const box = document.getElementById('signal-alert');
-  if (!recent.length) { box.classList.remove('visible'); return; }
-  box.classList.add('visible');
-  document.getElementById('alert-pills').innerHTML = recent.map(s=>{
-    const t = s.logged_at
-      ? new Date(s.logged_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
-      : '';
-    return `<div class="signal-pill ${s.predict_color}">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem">${s.sequence_str||'—'}</span>
-      <span>${EMOJI[s.predict_color]||'?'} <b>${(s.predict_color||'').toUpperCase()}</b></span>
-      <span style="color:var(--accent2);font-weight:700">${s.confidence}%</span>
-      ${t?`<span style="color:var(--muted)">${t}</span>`:''}
+    return `<div class="ball ${r.color}${isLatest ? ' latest' : ''}" title="${r.color} — roll ${roll}${isLatest ? ' (ATUAL)' : ''}">
+      <span class="ball-num">${roll}</span>
+      <span class="ball-lbl">${(r.color||'').substring(0,3).toUpperCase()}</span>
     </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════
-   CHARTS
-═══════════════════════════════════════════════════ */
-const C = Chart;
-const FONT = "'Inter', sans-serif";
+function renderSignal(bet) {
+  const box   = document.getElementById('signal-box');
+  const color = document.getElementById('signal-color');
+  const seq   = document.getElementById('signal-seq');
+  const conf  = document.getElementById('conf-big');
+  const occ   = document.getElementById('occ-badge');
 
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  if (!bet) {
+    box.className = 'signal-box idle';
+    color.className = 'signal-color idle'; color.textContent = '— Sem sinal';
+    seq.textContent = ''; conf.className = 'conf-big idle'; conf.textContent = '—%';
+    occ.textContent = '— ocorrências';
+    return;
+  }
+  const c  = bet.predict_color;
+  const cv = bet.confidence >= 90 ? 'high' : bet.confidence >= 80 ? 'mid' : 'low';
+  box.className = `signal-box active-${c}`;
+  color.className = `signal-color ${c}`;
+  color.textContent = `${EMOJI[c]||'?'} ${c.toUpperCase()}`;
+  seq.textContent = bet.sequence_str || '';
+  conf.className = `conf-big ${cv}`;
+  conf.textContent = bet.confidence + '%';
+  occ.textContent = (bet.occurrences || 0) + '× histórico';
 }
 
-function renderCharts() {
-  renderConfDist();
-  renderColorPie();
-  renderSizeBar();
-  renderTop10();
-  renderSignalsHour();
+function renderStats(s) {
+  if (!s) return;
+  const wr = document.getElementById('stat-winrate');
+  wr.textContent = s.total > 0 ? s.win_rate + '%' : '—';
+  wr.className = 'stat-box-value ' + (s.win_rate >= 60 ? 'green' : s.win_rate >= 45 ? 'yellow' : 'red');
+  document.getElementById('stat-wins').textContent   = s.wins;
+  document.getElementById('stat-losses').textContent = s.losses;
+  document.getElementById('stat-total').textContent  = s.total + ' apostas';
+
+  const strEl  = document.getElementById('stat-streak');
+  const strSub = document.getElementById('stat-streak-type');
+  if (s.win_streak > 0) {
+    strEl.textContent = '🔥 ' + s.win_streak; strEl.className = 'stat-box-value yellow';
+    strSub.textContent = 'wins seguidos';
+  } else if (s.loss_streak > 0) {
+    strEl.textContent = '💔 ' + s.loss_streak; strEl.className = 'stat-box-value red';
+    strSub.textContent = 'losses seguidos';
+  } else {
+    strEl.textContent = '—'; strEl.className = 'stat-box-value yellow';
+    strSub.textContent = 'sem streak';
+  }
+
+  const pills = document.getElementById('history-pills');
+  pills.innerHTML = (s.history || []).slice(-30).map(h =>
+    `<div class="hpill ${h.result}" title="${h.result.toUpperCase()} — ${new Date(h.timestamp).toLocaleTimeString('pt-BR')}"></div>`
+  ).join('');
 }
 
-function renderConfDist() {
-  destroyChart('conf-dist');
-  const buckets = {'70-79':0,'80-89':0,'90-94':0,'95-99':0,'100':0};
-  strats.forEach(s=>{
-    if(s.confidence<80)       buckets['70-79']++;
-    else if(s.confidence<90)  buckets['80-89']++;
-    else if(s.confidence<95)  buckets['90-94']++;
-    else if(s.confidence<100) buckets['95-99']++;
-    else                      buckets['100']++;
-  });
-  const ctx = document.getElementById('chart-conf-dist').getContext('2d');
-  charts['conf-dist'] = new C(ctx,{
-    type:'bar',
-    data:{
-      labels:Object.keys(buckets),
-      datasets:[{
-        data:Object.values(buckets),
-        backgroundColor:['#3b82f680','#f59e0b80','#22c55e80','#a855f780','#7c3aed'],
-        borderColor:['#3b82f6','#f59e0b','#22c55e','#a855f7','#7c3aed'],
-        borderWidth:2,borderRadius:6,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+' estratégias'}}},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'}},
-        y:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},beginAtZero:true}
-      }
-    }
-  });
+function setOnline(ok) {
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  dot.style.background = ok ? 'var(--green)' : 'var(--red)';
+  dot.style.boxShadow  = ok ? '0 0 6px var(--green)' : '0 0 6px var(--red)';
+  text.textContent = ok ? 'API conectada' : 'API offline — sem dados ao vivo';
 }
 
-function renderColorPie() {
-  destroyChart('color-pie');
-  const cnt = {preto:0,vermelho:0,branco:0};
-  strats.forEach(s=>{ if(cnt[s.predict_color]!==undefined) cnt[s.predict_color]++; });
-  const ctx = document.getElementById('chart-color-pie').getContext('2d');
-  charts['color-pie'] = new C(ctx,{
-    type:'doughnut',
-    data:{
-      labels:['⚫ Preto','🔴 Vermelho','⚪ Branco'],
-      datasets:[{
-        data:[cnt.preto,cnt.vermelho,cnt.branco],
-        backgroundColor:['#47556980','#ef444480','#94a3b880'],
-        borderColor:['#475569','#ef4444','#94a3b8'],
-        borderWidth:2,hoverOffset:8,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{
-        legend:{position:'bottom',labels:{color:'#94a3b8',font:{family:FONT,size:10},padding:10}},
-        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}`}}
-      }
-    }
-  });
+/* ══════════════════════════════════════════
+   WIN / LOSS / RESET
+══════════════════════════════════════════ */
+async function logResult(result) {
+  try {
+    const r = await fetch(API + '/api/log-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ result }),
+      signal: AbortSignal.timeout(4000)
+    });
+    const d = await r.json();
+    if (d.status === 'ok') { showToast(result === 'win' ? '✅ Win registrado!' : '❌ Loss registrado!', 'ok'); poll(); }
+    else showToast('Erro: ' + (d.error || 'desconhecido'), 'err');
+  } catch { showToast('Erro de conexão com a API', 'err'); }
 }
 
-function renderSizeBar() {
-  destroyChart('size-bar');
-  const cnt = {4:0,5:0,6:0};
-  strats.forEach(s=>{ if(cnt[s.sequence_size]!==undefined) cnt[s.sequence_size]++; });
-  const ctx = document.getElementById('chart-size-bar').getContext('2d');
-  charts['size-bar'] = new C(ctx,{
-    type:'bar',
-    data:{
-      labels:['4 cores','5 cores','6 cores'],
-      datasets:[{
-        data:[cnt[4],cnt[5],cnt[6]],
-        backgroundColor:['#3b82f680','#f59e0b80','#a855f780'],
-        borderColor:['#3b82f6','#f59e0b','#a855f7'],
-        borderWidth:2,borderRadius:8,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'}},
-        y:{ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},beginAtZero:true}
-      }
-    }
-  });
+async function resetStats() {
+  if (!confirm('Zerar wins/losses? O banco de dados NÃO será afetado.')) return;
+  try {
+    const r = await fetch(API + '/api/reset-stats', { method: 'POST', signal: AbortSignal.timeout(4000) });
+    const d = await r.json();
+    if (d.status === 'ok') { showToast('🗑️ Stats zeradas!', 'ok'); poll(); }
+    else showToast('Erro: ' + (d.error || ''), 'err');
+  } catch { showToast('Erro de conexão', 'err'); }
 }
 
-function renderTop10() {
-  destroyChart('top10');
-  const top = [...strats].sort((a,b)=>b.confidence-a.confidence).slice(0,10);
-  const colorMap = {preto:'#47556980',vermelho:'#ef444480',branco:'#94a3b880'};
-  const borderMap = {preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
-  const ctx = document.getElementById('chart-top10').getContext('2d');
-  charts['top10'] = new C(ctx,{
-    type:'bar',
-    data:{
-      labels:top.map(s=>s.sequence_str.length>30?s.sequence_str.substring(0,28)+'…':s.sequence_str),
-      datasets:[{
-        data:top.map(s=>s.confidence),
-        backgroundColor:top.map(s=>colorMap[s.predict_color]||'#7c3aed80'),
-        borderColor:top.map(s=>borderMap[s.predict_color]||'#7c3aed'),
-        borderWidth:2,borderRadius:5,
-      }]
-    },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}% confiança`}}},
-      scales:{
-        x:{min:70,max:100,ticks:{color:'#64748b',font:{family:FONT,size:10}},grid:{color:'#252538'},
-           title:{display:true,text:'Confiança (%)',color:'#64748b',font:{size:10}}},
-        y:{ticks:{color:'#94a3b8',font:{family:FONT,size:9}},grid:{display:false}}
-      }
-    }
-  });
-}
-
-function renderSignalsHour() {
-  destroyChart('signals-hour');
-  const hrs = Array(24).fill(0);
-  const today = new Date().toISOString().slice(0,10);
-  signals
-    .filter(s=>s.logged_at&&s.logged_at.startsWith(today))
-    .forEach(s=>{ const h=new Date(s.logged_at).getHours(); hrs[h]++; });
-  const labels = Array.from({length:24},(_,i)=>i.toString().padStart(2,'0')+'h');
-  const ctx = document.getElementById('chart-signals-hour').getContext('2d');
-  charts['signals-hour'] = new C(ctx,{
-    type:'line',
-    data:{
-      labels,
-      datasets:[{
-        data:hrs,
-        borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.15)',
-        fill:true,tension:0.4,pointRadius:3,
-        pointBackgroundColor:'#a855f7',borderWidth:2,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'}},
-        y:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},beginAtZero:true,
-           title:{display:true,text:'Sinais',color:'#64748b',font:{size:9}}}
-      }
-    }
-  });
-}
-
-/* ═══════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    STRATEGIES TABLE
-═══════════════════════════════════════════════════ */
+══════════════════════════════════════════ */
+async function loadStrategies() {
+  try {
+    const r = await fetch('/data/strategies.json');
+    if (!r.ok) throw new Error();
+    strats = await r.json();
+    document.getElementById('nb-strats').textContent = strats.length;
+    renderStrategies();
+  } catch { strats = []; }
+}
+
 function getFiltered() {
   const q  = document.getElementById('strat-search').value.toLowerCase();
   const sz = document.getElementById('strat-size').value;
   const cl = document.getElementById('strat-color').value;
   const mn = parseFloat(document.getElementById('strat-conf').value);
-  return [...strats]
-    .filter(s=>{
-      if(s.confidence < mn) return false;
-      if(sz!=='all'&&s.sequence_size!==parseInt(sz)) return false;
-      if(cl!=='all'&&s.predict_color!==cl) return false;
-      if(q&&!s.sequence_str.toLowerCase().includes(q)) return false;
-      return true;
-    })
-    .sort((a,b)=>b[sortField]-a[sortField]);
+  return [...strats].filter(s => {
+    if (s.confidence < mn) return false;
+    if (sz !== 'all' && s.sequence_size !== parseInt(sz)) return false;
+    if (cl !== 'all' && s.predict_color !== cl) return false;
+    if (q && !s.sequence_str.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b) => b[sortField] - a[sortField]);
 }
 
-function sortStrats(f){ sortField=f; renderStrategies(); }
+function sortStrats(f) { sortField = f; renderStrategies(); }
 
 function renderStrategies() {
   const data  = getFiltered();
   const tbody = document.getElementById('strat-tbody');
   const empty = document.getElementById('strat-empty');
-  const tcard = document.querySelector('#page-strategies .table-card table');
+  const tbl   = document.querySelector('#page-strategies table');
   if (!data.length) {
-    tbody.innerHTML=''; empty.style.display='block'; if(tcard) tcard.style.display='none'; return;
+    tbody.innerHTML = ''; empty.style.display = 'block';
+    if (tbl) tbl.style.display = 'none'; return;
   }
-  empty.style.display='none'; if(tcard) tcard.style.display='';
-  tbody.innerHTML = data.map((s,i)=>{
-    const chips = s.sequence.map(c=>`<span class="chip ${c}">${c.substring(0,3).toUpperCase()}</span>`).join('<span class="arrow">›</span>');
-    const cc = s.confidence>=90?'high':s.confidence>=80?'med':'low';
-    const cv = s.confidence>=90?'var(--green)':s.confidence>=80?'var(--yellow)':'var(--red)';
-    const mx = Math.max(...Object.values(s.distribution||{preto:0}));
-    const dist = Object.entries(s.distribution||{}).map(([c,p])=>{
-      const h = Math.max(3,Math.round(p/mx*26));
+  empty.style.display = 'none'; if (tbl) tbl.style.display = '';
+  tbody.innerHTML = data.map((s, i) => {
+    const chips = s.sequence.map(c =>
+      `<span class="chip ${c}">${c.substring(0,3).toUpperCase()}</span>`
+    ).join('<span class="arrow">›</span>');
+    const cc = s.confidence >= 90 ? 'high' : s.confidence >= 80 ? 'med' : 'low';
+    const cv = s.confidence >= 90 ? 'var(--green)' : s.confidence >= 80 ? 'var(--yellow)' : 'var(--red)';
+    const mx = Math.max(...Object.values(s.distribution || {preto:0}));
+    const dist = Object.entries(s.distribution || {}).map(([c,p]) => {
+      const h = Math.max(3, Math.round(p/mx*22));
       return `<div class="dm-col"><div class="dm-bar ${c}" style="height:${h}px" title="${c}: ${p}%"></div><div class="dm-lbl">${c.substring(0,3).toUpperCase()}</div></div>`;
     }).join('');
     return `<tr>
-      <td style="color:var(--muted);font-size:.72rem">${i+1}</td>
+      <td style="color:var(--muted);font-size:.7rem">${i+1}</td>
       <td><div class="seq-chips">${chips}</div></td>
       <td><span class="predict-badge ${s.predict_color}">${EMOJI[s.predict_color]||'?'} ${(s.predict_color||'').toUpperCase()}</span></td>
       <td><div class="conf-cell">
@@ -1240,28 +972,38 @@ function renderStrategies() {
       </div></td>
       <td><div class="dist-mini">${dist}</div></td>
       <td><span class="occ">${s.occurrences}×</span></td>
-      <td style="color:var(--muted);font-size:.75rem">${s.sequence_size}c</td>
+      <td style="color:var(--muted);font-size:.72rem">${s.sequence_size}c</td>
     </tr>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════
-   SIGNALS LIST
-═══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   SIGNALS
+══════════════════════════════════════════ */
+async function loadSignals() {
+  try {
+    const r = await fetch('/data/signals_log.json');
+    if (!r.ok) throw new Error();
+    signals = await r.json();
+    document.getElementById('nb-signals').textContent = signals.length;
+    renderSignals();
+  } catch { signals = []; }
+}
+
 function renderSignals() {
   const list  = document.getElementById('signals-list');
   const empty = document.getElementById('signals-empty');
-  if (!signals.length) { list.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  list.innerHTML = signals.slice(0,100).map(s=>{
+  if (!signals.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = signals.slice(0,100).map(s => {
     const t = s.logged_at ? new Date(s.logged_at).toLocaleString('pt-BR') : '—';
-    const dist = Object.entries(s.distribution||{}).map(([c,p])=>
-      `<span style="font-size:.72rem;color:var(--muted2)">${c.substring(0,3).toUpperCase()}: <b style="color:var(--text)">${p}%</b></span>`
-    ).join('<span style="color:var(--muted);margin:0 5px">|</span>');
+    const dist = Object.entries(s.distribution||{}).map(([c,p]) =>
+      `<span style="font-size:.7rem;color:var(--muted2)">${c.substring(0,3).toUpperCase()}: <b style="color:var(--text)">${p}%</b></span>`
+    ).join('<span style="color:var(--muted);margin:0 4px">|</span>');
     return `<div class="signal-card ${s.predict_color}">
       <div>
         <div class="sc-seq">${s.sequence_str||'—'}</div>
-        <div class="sc-meta" style="margin-top:6px">${dist}</div>
+        <div class="sc-meta" style="margin-top:5px">${dist}</div>
       </div>
       <div class="sc-meta">
         <span class="predict-badge ${s.predict_color}">${EMOJI[s.predict_color]||'?'} ${(s.predict_color||'').toUpperCase()}</span>
@@ -1273,9 +1015,9 @@ function renderSignals() {
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    HEATMAP
-═══════════════════════════════════════════════════ */
+══════════════════════════════════════════ */
 function renderHeatmapPage() {
   renderHeatmapGrid();
   renderOccTop();
@@ -1286,16 +1028,16 @@ function renderHeatmapGrid() {
   const sizes  = [4,5,6];
   const colors = ['preto','vermelho','branco'];
   let html = '';
-  sizes.forEach(sz=>{
-    colors.forEach(cl=>{
-      const group = strats.filter(s=>s.sequence_size===sz&&s.predict_color===cl);
-      const avg   = group.length?(group.reduce((a,b)=>a+b.confidence,0)/group.length):0;
-      const alpha = avg?Math.max(0.15,(avg-70)/30):0;
-      const clr   = cl==='vermelho'?`rgba(239,68,68,${alpha})`:
-                    cl==='preto'   ?`rgba(71,85,105,${alpha})`:
-                                    `rgba(148,163,184,${alpha})`;
-      const border= cl==='vermelho'?`#ef4444`:cl==='preto'?`#475569`:`#94a3b8`;
-      html += `<div class="hm-cell" style="background:${clr};border-color:${avg?border:'transparent'}" title="${sz} cores → ${cl}: ${avg?avg.toFixed(1)+'%':'-'}">
+  sizes.forEach(sz => {
+    colors.forEach(cl => {
+      const group = strats.filter(s => s.sequence_size===sz && s.predict_color===cl);
+      const avg   = group.length ? group.reduce((a,b)=>a+b.confidence,0)/group.length : 0;
+      const alpha = avg ? Math.max(0.15,(avg-70)/30) : 0;
+      const clr   = cl==='vermelho' ? `rgba(239,68,68,${alpha})`
+                  : cl==='preto'    ? `rgba(71,85,105,${alpha})`
+                  :                   `rgba(148,163,184,${alpha})`;
+      const border= cl==='vermelho' ? '#ef4444' : cl==='preto' ? '#475569' : '#94a3b8';
+      html += `<div class="hm-cell" style="background:${clr};border:1px solid ${avg?border:'transparent'}" title="${sz}c → ${cl}: ${avg?avg.toFixed(1)+'%':'-'}">
         ${avg?avg.toFixed(0):'—'}
       </div>`;
     });
@@ -1303,29 +1045,33 @@ function renderHeatmapGrid() {
   document.getElementById('heatmap-grid').innerHTML = html;
 }
 
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
 function renderOccTop() {
   destroyChart('occ-top');
-  const top=[...strats].sort((a,b)=>b.occurrences-a.occurrences).slice(0,12);
-  const colorMap={preto:'#47556980',vermelho:'#ef444480',branco:'#94a3b880'};
-  const borderMap={preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
-  const ctx=document.getElementById('chart-occ-top').getContext('2d');
-  charts['occ-top']=new C(ctx,{
-    type:'bar',
-    data:{
-      labels:top.map(s=>s.sequence_str.length>28?s.sequence_str.substring(0,26)+'…':s.sequence_str),
-      datasets:[{
-        data:top.map(s=>s.occurrences),
-        backgroundColor:top.map(s=>colorMap[s.predict_color]||'#7c3aed80'),
-        borderColor:top.map(s=>borderMap[s.predict_color]||'#7c3aed'),
-        borderWidth:2,borderRadius:4,
+  const top = [...strats].sort((a,b)=>b.occurrences-a.occurrences).slice(0,12);
+  const colorMap  = {preto:'#47556980',vermelho:'#ef444480',branco:'#94a3b880'};
+  const borderMap = {preto:'#475569',vermelho:'#ef4444',branco:'#94a3b8'};
+  const ctx = document.getElementById('chart-occ-top').getContext('2d');
+  charts['occ-top'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top.map(s => s.sequence_str.length>26 ? s.sequence_str.substring(0,24)+'…' : s.sequence_str),
+      datasets: [{
+        data: top.map(s=>s.occurrences),
+        backgroundColor: top.map(s=>colorMap[s.predict_color]||'#7c3aed80'),
+        borderColor: top.map(s=>borderMap[s.predict_color]||'#7c3aed'),
+        borderWidth: 2, borderRadius: 4,
       }]
     },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},beginAtZero:true},
-        y:{ticks:{color:'#94a3b8',font:{family:FONT,size:8}},grid:{display:false}}
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks:{color:'#64748b',font:{family:FONT,size:9}}, grid:{color:'#1e2035'}, beginAtZero:true },
+        y: { ticks:{color:'#94a3b8',font:{family:FONT,size:8}}, grid:{display:false} }
       }
     }
   });
@@ -1333,51 +1079,59 @@ function renderOccTop() {
 
 function renderScatter() {
   destroyChart('scatter');
-  const sample=strats.slice(0,200);
-  const datasets=[
-    {label:'⚫ Preto',   data:sample.filter(s=>s.predict_color==='preto').map(s=>({x:s.occurrences,y:s.confidence})),  backgroundColor:'#47556980',borderColor:'#475569',pointRadius:5},
-    {label:'🔴 Vermelho',data:sample.filter(s=>s.predict_color==='vermelho').map(s=>({x:s.occurrences,y:s.confidence})),backgroundColor:'#ef444480',borderColor:'#ef4444',pointRadius:5},
-    {label:'⚪ Branco',  data:sample.filter(s=>s.predict_color==='branco').map(s=>({x:s.occurrences,y:s.confidence})), backgroundColor:'#94a3b880',borderColor:'#94a3b8',pointRadius:5},
+  const sample = strats.slice(0,200);
+  const datasets = [
+    {label:'⚫ Preto',   data:sample.filter(s=>s.predict_color==='preto').map(s=>({x:s.occurrences,y:s.confidence})),   backgroundColor:'#47556980',borderColor:'#475569',pointRadius:4},
+    {label:'🔴 Vermelho',data:sample.filter(s=>s.predict_color==='vermelho').map(s=>({x:s.occurrences,y:s.confidence})),backgroundColor:'#ef444480',borderColor:'#ef4444',pointRadius:4},
+    {label:'⚪ Branco',  data:sample.filter(s=>s.predict_color==='branco').map(s=>({x:s.occurrences,y:s.confidence})),  backgroundColor:'#94a3b880',borderColor:'#94a3b8',pointRadius:4},
   ];
-  const ctx=document.getElementById('chart-scatter').getContext('2d');
-  charts['scatter']=new C(ctx,{
-    type:'scatter',
-    data:{datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{family:FONT,size:9},padding:8}}},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},
-           title:{display:true,text:'Ocorrências',color:'#64748b',font:{size:9}}},
-        y:{min:70,ticks:{color:'#64748b',font:{family:FONT,size:9}},grid:{color:'#252538'},
-           title:{display:true,text:'Confiança (%)',color:'#64748b',font:{size:9}}}
+  const ctx = document.getElementById('chart-scatter').getContext('2d');
+  charts['scatter'] = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{position:'bottom',labels:{color:'#94a3b8',font:{family:FONT,size:9},padding:8}} },
+      scales: {
+        x: { ticks:{color:'#64748b',font:{family:FONT,size:9}}, grid:{color:'#1e2035'}, title:{display:true,text:'Ocorrências',color:'#64748b',font:{size:9}} },
+        y: { min:70, ticks:{color:'#64748b',font:{family:FONT,size:9}}, grid:{color:'#1e2035'}, title:{display:true,text:'Confiança (%)',color:'#64748b',font:{size:9}} }
       }
     }
   });
 }
 
-/* ═══════════════════════════════════════════════════
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 3000);
+}
+
+/* ══════════════════════════════════════════
    EVENTS
-═══════════════════════════════════════════════════ */
-document.getElementById('strat-search').addEventListener('input',renderStrategies);
-document.getElementById('strat-size').addEventListener('change',renderStrategies);
-document.getElementById('strat-color').addEventListener('change',renderStrategies);
-document.getElementById('strat-conf').addEventListener('input',function(){
-  document.getElementById('conf-val').textContent=this.value+'%';
+══════════════════════════════════════════ */
+document.getElementById('strat-search').addEventListener('input', renderStrategies);
+document.getElementById('strat-size').addEventListener('change', renderStrategies);
+document.getElementById('strat-color').addEventListener('change', renderStrategies);
+document.getElementById('strat-conf').addEventListener('input', function() {
+  document.getElementById('conf-val').textContent = this.value + '%';
   renderStrategies();
 });
 
-/* ═══════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    INIT
-═══════════════════════════════════════════════════ */
-loadAll().then(() => {
-  // Auto-start live polling
-  startLivePolling();
-});
-// Also reload strategies every 30s
-setInterval(async () => {
-  await loadStrategies();
-  updateAll();
+══════════════════════════════════════════ */
+loadStrategies();
+loadSignals();
+startPoll();
+
+// Reload estático a cada 30s
+setInterval(() => {
+  loadStrategies();
+  loadSignals();
 }, 30000);
 </script>
 </body>
