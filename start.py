@@ -112,11 +112,19 @@ def start_dashboard_server():
             pass  # silencia logs do servidor
 
     try:
+        socketserver.TCPServer.allow_reuse_address = True
         with socketserver.TCPServer(("", DASH_PORT), Handler) as httpd:
             httpd.serve_forever()
-    except OSError:
-        # Porta já em uso — tenta próxima
-        pass
+    except OSError as e:
+        log("DASH", f"Porta {DASH_PORT} em uso ou erro: {e}", YELLOW)
+
+# ── Servidor de API ───────────────────────────────────────
+def _start_api_server():
+    try:
+        from api_server import start_server
+        start_server(port=8765)
+    except Exception as e:
+        log("API", f"Erro ao iniciar API: {e}", RED)
 
 # ── Subprocessos ──────────────────────────────────────────
 processes = []
@@ -141,7 +149,7 @@ def start_process(name, args, color=CYAN):
 
 # ── Abre Dashboard ────────────────────────────────────────
 def open_dashboard():
-    url = f"http://localhost:{DASH_PORT}/dashboard/index.html"
+    url = f"http://localhost:{DASH_PORT}/index.html"
     log("DASH", f"Abrindo dashboard → {url}", GREEN)
     time.sleep(1.5)
     webbrowser.open(url)
@@ -186,17 +194,25 @@ def main():
     step(3, 5, "Dashboard pronto")
     print()
 
-    # 4. Coletor WebSocket
-    step(3, 5, "Iniciando coletor Blaze...")
-    start_process("COLETOR", [sys.executable, "main.py", "collect"], CYAN)
-    time.sleep(2)
-    step(4, 5, "Coletor ativo")
+    # 4. API Server
+    step(3, 5, "Iniciando servidor de API...")
+    api_thread = threading.Thread(target=_start_api_server, daemon=True)
+    api_thread.start()
+    time.sleep(0.5)
+    log("API", f"API rodando em http://localhost:8765", GREEN)
+    step(4, 5, "API pronta")
     print()
 
-    # 5. Monitor em tempo real
-    step(4, 5, "Iniciando monitor...")
+    # 5. Coletor WebSocket
+    step(4, 5, "Iniciando coletor Blaze...")
+    start_process("COLETOR", [sys.executable, "main.py", "collect"], CYAN)
+    time.sleep(2)
+    step(5, 5, "Coletor ativo")
+    print()
+
+    # 6. Monitor em tempo real
+    step(5, 5, "Iniciando monitor...")
     start_process("MONITOR", [sys.executable, "main.py", "monitor"], GREEN)
-    step(5, 5, "Monitor ativo")
     print()
 
     # 6. Abre o dashboard no navegador
